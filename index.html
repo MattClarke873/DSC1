@@ -149,6 +149,52 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 .modal-btns{display:flex;gap:10px}
 .m-cancel{flex:1;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:15px;cursor:pointer}
 .m-confirm{flex:1;background:var(--danger);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer}
+
+/* QUESTION BANK */
+#qbank{background:var(--bg)}
+.qb-hd{display:flex;align-items:center;gap:14px;padding:calc(var(--safe-top) + 16px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0}
+.qb-hd h2{font-size:22px;font-weight:700}
+.qb-filter-row{display:flex;gap:8px;padding:12px 18px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.qb-filter{background:transparent;border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.qb-filter.active{background:var(--acc);border-color:var(--acc);color:var(--acc-text)}
+.qb-filter span{font-weight:700}
+.qb-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(var(--safe-bot) + 20px)}
+.qb-item{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .15s}
+.qb-item:active{background:var(--surf2)}
+.qb-item.has-wrong{border-left:3px solid var(--wrong)}
+.qb-item.has-correct{border-left:3px solid var(--correct)}
+.qb-item.unseen{border-left:3px solid var(--border)}
+.qb-status{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;margin-top:1px}
+.qb-status.wrong{background:var(--danger-dim);color:var(--wrong)}
+.qb-status.correct{background:var(--acc-dim);color:var(--correct)}
+.qb-status.mixed{background:rgba(255,165,0,.15);color:orange}
+.qb-status.unseen{background:var(--surf2);color:var(--text3)}
+.qb-info{flex:1}
+.qb-qnum{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.qb-qtext{font-size:14px;color:var(--text);line-height:1.4}
+.qb-tally{font-size:12px;margin-top:6px;display:flex;gap:10px}
+.qb-tally-c{color:var(--correct);font-weight:600}
+.qb-tally-w{color:var(--wrong);font-weight:600}
+/* Question detail overlay */
+.qb-detail-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;flex-direction:column}
+.qb-detail-overlay.show{display:flex}
+.qb-detail-hd{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0}
+.qb-detail-hd h3{font-size:17px;font-weight:700;flex:1}
+.qb-detail-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 18px calc(var(--safe-bot) + 24px)}
+.qb-detail-q{font-size:18px;line-height:1.45;color:var(--text);margin-bottom:20px;font-weight:400}
+.qb-detail-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.qb-detail-opt{display:flex;gap:12px;padding:13px 14px;background:var(--surf);border:1.5px solid var(--border);border-radius:14px;align-items:flex-start}
+.qb-detail-opt.correct{border-color:var(--correct);background:rgba(76,175,120,.12)}
+.qb-detail-opt.correct .qb-dl{background:var(--acc-dim);border-color:var(--correct);color:var(--correct)}
+.qb-dl{width:26px;height:26px;border-radius:50%;background:var(--surf2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--text3);flex-shrink:0;margin-top:1px}
+.qb-dt{font-size:15px;line-height:1.45;color:var(--text);flex:1}
+.qb-detail-opt.correct .qb-dt{color:var(--correct)}
+.qb-stat-row{display:flex;gap:10px;margin-top:4px}
+.qb-stat-pill{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.qb-stat-pill .val{font-size:22px;font-weight:700}
+.qb-stat-pill .val.g{color:var(--correct)}.qb-stat-pill .val.r{color:var(--wrong)}
+.qb-stat-pill .lbl{font-size:11px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+
 </style>
 </head>
 <body>
@@ -183,6 +229,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   <div class="home-btns">
     <button class="btn-primary" onclick="startQuiz()">Start New Quiz</button>
     <button class="btn-ghost" onclick="showHistory()">View Score History</button>
+    <button class="btn-ghost" onclick="showQBank()">Question Bank &amp; Stats</button>
   </div>
 </div>
 
@@ -263,7 +310,38 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   <div id="histList"></div>
 </div>
 
+<!-- QUESTION BANK -->
+<div id="qbank" class="screen">
+  <div class="qb-hd">
+    <button class="back-btn" onclick="showHome()">&larr; Back</button>
+    <h2>Question Bank</h2>
+  </div>
+  <div class="qb-filter-row" id="qbFilterRow">
+    <button class="qb-filter active" onclick="setQBFilter('all',this)">All <span id="fAll"></span></button>
+    <button class="qb-filter" onclick="setQBFilter('wrong',this)">Wrong <span id="fWrong"></span></button>
+    <button class="qb-filter" onclick="setQBFilter('correct',this)">Correct <span id="fCorrect"></span></button>
+    <button class="qb-filter" onclick="setQBFilter('unseen',this)">Unseen <span id="fUnseen"></span></button>
+  </div>
+  <div class="qb-body" id="qbBody"></div>
 </div>
+
+</div>
+<!-- QUESTION DETAIL OVERLAY -->
+<div class="qb-detail-overlay" id="qbDetailOverlay">
+  <div class="qb-detail-hd">
+    <button class="back-btn" onclick="closeQDetail()">&larr; Back</button>
+    <h3 id="qbDetailQnum">Question 1</h3>
+  </div>
+  <div class="qb-detail-body">
+    <div class="qb-detail-q" id="qbDetailQ"></div>
+    <div class="qb-detail-opts" id="qbDetailOpts"></div>
+    <div class="qb-stat-row">
+      <div class="qb-stat-pill"><div class="val g" id="qbDetailC">0</div><div class="lbl">Times Correct</div></div>
+      <div class="qb-stat-pill"><div class="val r" id="qbDetailW">0</div><div class="lbl">Times Wrong</div></div>
+    </div>
+  </div>
+</div>
+
 
 <!-- FINISH MODAL -->
 <div class="modal-overlay" id="finishModal">
@@ -569,7 +647,7 @@ const QB=[
 /* ============================================================
    STORAGE
    ============================================================ */
-const SK={history:'dsc1_hist',weights:'dsc1_wts',session:'dsc1_sess'};
+const SK={history:'dsc1_hist',weights:'dsc1_wts',session:'dsc1_sess',qstats:'dsc1_qstats'};
 function ld(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function rm(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -704,6 +782,11 @@ function selectAnswer(i){
   if(i!==correct){w[q.origIdx]=(w[q.origIdx]||0)+1;}
   else if(w[q.origIdx]>0){w[q.origIdx]=Math.max(0,w[q.origIdx]-1);if(w[q.origIdx]===0)delete w[q.origIdx];}
   sv(SK.weights,w);
+  // Update per-question stats
+  const qs=ld(SK.qstats)||{};
+  if(!qs[q.origIdx]) qs[q.origIdx]={c:0,w:0};
+  if(i===correct) qs[q.origIdx].c++; else qs[q.origIdx].w++;
+  sv(SK.qstats,qs);
   // Show feedback
   document.querySelectorAll('.option').forEach((el,idx)=>{
     el.style.pointerEvents='none';
@@ -799,6 +882,88 @@ function renderHistory(){
 function clearHistory(){
   if(confirm('Clear all score history and difficulty weights?')){rm(SK.history);rm(SK.weights);renderHistory();renderHome();}
 }
+
+
+/* ============================================================
+   QUESTION BANK
+   ============================================================ */
+let qbFilter='all';
+function showQBank(){renderQBank();show('qbank');}
+function setQBFilter(f,btn){
+  qbFilter=f;
+  document.querySelectorAll('.qb-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQBList();
+}
+function renderQBank(){
+  const qs=ld(SK.qstats)||{};
+  let all=0,wrong=0,correct=0,unseen=0;
+  QB.forEach((_,i)=>{
+    all++;
+    const s=qs[i];
+    if(!s){unseen++;}
+    else if(s.w>0&&s.c===0){wrong++;}
+    else if(s.w>0&&s.c>0){wrong++;correct++;} // mixed counts in both
+    else if(s.c>0){correct++;}
+  });
+  document.getElementById('fAll').textContent='('+all+')';
+  document.getElementById('fWrong').textContent='('+wrong+')';
+  document.getElementById('fCorrect').textContent='('+correct+')';
+  document.getElementById('fUnseen').textContent='('+unseen+')';
+  renderQBList();
+}
+function renderQBList(){
+  const qs=ld(SK.qstats)||{};
+  const L=['A','B','C','D'];
+  let html='';
+  let count=0;
+  QB.forEach((q,i)=>{
+    const s=qs[i];
+    const hasCorrect=s&&s.c>0;
+    const hasWrong=s&&s.w>0;
+    const unseen=!s;
+    if(qbFilter==='wrong'&&!hasWrong) return;
+    if(qbFilter==='correct'&&!hasCorrect) return;
+    if(qbFilter==='unseen'&&!unseen) return;
+    count++;
+    let statusClass='unseen',statusIcon='&mdash;',itemClass='unseen';
+    if(hasWrong&&hasCorrect){statusClass='mixed';statusIcon='~';itemClass='has-wrong';}
+    else if(hasWrong){statusClass='wrong';statusIcon='&times;';itemClass='has-wrong';}
+    else if(hasCorrect){statusClass='correct';statusIcon='&check;';itemClass='has-correct';}
+    const tally=s?`<div class="qb-tally"><span class="qb-tally-c">&#10003; ${s.c}</span><span class="qb-tally-w">&#10007; ${s.w}</span></div>`:'<div class="qb-tally" style="color:var(--text3);font-size:12px">Not yet attempted</div>';
+    html+=`<div class="qb-item ${itemClass}" onclick="showQDetail(${i})">
+      <div class="qb-status ${statusClass}">${statusIcon}</div>
+      <div class="qb-info">
+        <div class="qb-qnum">Q${i+1}</div>
+        <div class="qb-qtext">${q.q}</div>
+        ${tally}
+      </div>
+    </div>`;
+  });
+  if(count===0) html='<div style="color:var(--text3);text-align:center;padding:40px 20px;font-size:15px">No questions in this category yet.</div>';
+  document.getElementById('qbBody').innerHTML=html;
+}
+function showQDetail(i){
+  const q=QB[i];
+  const qs=ld(SK.qstats)||{};
+  const s=qs[i]||{c:0,w:0};
+  const L=['A','B','C','D'];
+  const overlay=document.getElementById('qbDetailOverlay');
+  document.getElementById('qbDetailQnum').textContent='Question '+(i+1)+' of '+QB.length;
+  document.getElementById('qbDetailQ').textContent=q.q;
+  const opts=q.o.map((opt,j)=>{
+    const isCor=j===q.a;
+    return`<div class="qb-detail-opt${isCor?' correct':''}">
+      <div class="qb-dl">${L[j]}</div>
+      <div class="qb-dt">${opt}${isCor?' &check;':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('qbDetailOpts').innerHTML=opts;
+  document.getElementById('qbDetailC').textContent=s.c;
+  document.getElementById('qbDetailW').textContent=s.w;
+  overlay.classList.add('show');
+}
+function closeQDetail(){document.getElementById('qbDetailOverlay').classList.remove('show');}
 
 /* ============================================================
    INIT

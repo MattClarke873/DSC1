@@ -206,6 +206,68 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 .thresh-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer;border:none;box-shadow:0 0 0 3px var(--acc-dim)}
 .thresh-hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5}
 
+
+/* SAFETY QUIZ */
+.btn-safety{background:#3a7fc1;margin-top:0}
+.sq-hd{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0}
+.sq-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sq-left{display:flex;align-items:center;gap:8px}
+.sq-counter{font-size:13px;color:var(--text2);font-weight:600}
+.sq-scotland{font-size:11px;color:#3a7fc1;background:rgba(58,127,193,.15);padding:2px 8px;border-radius:100px;font-weight:700}
+.sq-compulsory{font-size:11px;color:orange;background:rgba(255,165,0,.12);padding:2px 8px;border-radius:100px;font-weight:700}
+.sq-right{display:flex;gap:8px}
+.sq-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 18px calc(var(--safe-bot) + 22px)}
+.sq-qnum{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:700}
+.sq-scenario{background:var(--surf2);border-left:3px solid #3a7fc1;border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:20px}
+.sq-scenario-lbl{font-size:11px;color:#3a7fc1;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.sq-qtext{font-size:18px;line-height:1.45;color:var(--text);font-weight:400}
+.sq-reveal-btn{width:100%;background:var(--surf);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:15px;color:var(--text2);cursor:pointer;margin-bottom:16px;transition:all .15s;font-weight:600}
+.sq-reveal-btn:active{background:var(--surf2)}
+.sq-answer{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;display:none}
+.sq-answer.visible{display:block}
+.sq-answer-hd{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:12px}
+.sq-std{font-size:12px;color:var(--acc);font-weight:700;margin-bottom:10px;padding:8px 12px;background:var(--acc-dim);border-radius:8px}
+.sq-bullet{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.45;color:var(--text);align-items:flex-start}
+.sq-bullet:last-child{border-bottom:none}
+.sq-bullet-dot{color:var(--acc);font-weight:700;flex-shrink:0;margin-top:2px}
+.sq-bullet.sub{padding-left:16px;color:var(--text2)}
+.sq-bullet.sub .sq-bullet-dot{color:var(--text3)}
+.sq-confidence{margin-top:8px}
+.sq-conf-lbl{font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:600;text-align:center}
+.sq-conf-btns{display:flex;gap:10px}
+.sq-conf-got{flex:1;background:var(--acc);color:var(--acc-text);border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:700;cursor:pointer}
+.sq-conf-needs{flex:1;background:var(--danger-dim);color:var(--wrong);border:1px solid var(--danger-dim);border-radius:12px;padding:15px;font-size:15px;font-weight:700;cursor:pointer}
+
+/* SAFETY RESULTS */
+#sqresults{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--safe-top) + 20px) 22px calc(var(--safe-bot) + 36px)}
+.sq-summary{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:20px}
+.sq-sum-hd{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:14px}
+.sq-sum-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.sq-sum-row:last-child{border-bottom:none}
+.sq-sum-q{color:var(--text);flex:1;line-height:1.4;padding-right:12px}
+.sq-sum-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px;flex-shrink:0}
+.sq-sum-tag.got{background:var(--acc-dim);color:var(--acc)}
+.sq-sum-tag.needs{background:var(--danger-dim);color:var(--wrong)}
+.sq-sum-tag.skipped{background:var(--surf2);color:var(--text3)}
+
+/* SAFETY QUESTION BANK */
+#sqbank{background:var(--bg)}
+.sq-bank-item{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .15s}
+.sq-bank-item:active{background:var(--surf2)}
+.sq-bank-item.got{border-left:3px solid var(--correct)}
+.sq-bank-item.needs{border-left:3px solid var(--wrong)}
+.sq-bank-item.unseen{border-left:3px solid var(--border)}
+.sq-bank-status{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;margin-top:2px}
+.sq-bank-status.got{background:var(--acc-dim);color:var(--correct)}
+.sq-bank-status.needs{background:var(--danger-dim);color:var(--wrong)}
+.sq-bank-status.unseen{background:var(--surf2);color:var(--text3)}
+.sq-bank-info{flex:1}
+.sq-bank-qnum{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;display:flex;gap:6px;align-items:center}
+.sq-bank-flag{font-size:10px;color:#3a7fc1;background:rgba(58,127,193,.15);padding:1px 7px;border-radius:100px;font-weight:700}
+.sq-bank-flag.comp{color:orange;background:rgba(255,165,0,.12)}
+.sq-bank-qtext{font-size:14px;color:var(--text);line-height:1.4}
+.sq-bank-tally{font-size:12px;color:var(--text3);margin-top:5px}
+
 </style>
 </head>
 <body>
@@ -215,7 +277,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 <div id="home" class="screen active">
   <div class="home-badge">DSC Level 1</div>
   <div class="home-title">Deer Stalking<br><strong>Certificate Quiz</strong></div>
-  <div class="home-sub">50 randomised questions &middot; exam simulation<br>Real exam pass mark: 80%</div>
+  <div class="home-sub">40 randomised questions &middot; exam simulation<br>Real exam pass mark: 80%</div>
   <div id="resumeBanner"></div>
   <div class="stats-row">
     <div class="stat-box"><div class="stat-val" id="sAttempts">0</div><div class="stat-lbl">Attempts</div></div>
@@ -247,9 +309,11 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   </div>
   <div id="recentList"></div>
   <div class="home-btns">
-    <button class="btn-primary" onclick="startQuiz()">Start New Quiz</button>
+    <button class="btn-primary" onclick="startQuiz()">Start Knowledge Quiz</button>
+    <button class="btn-primary btn-safety" onclick="startSafetyQuiz()">Start Safety Assessment</button>
     <button class="btn-ghost" onclick="showHistory()">View Score History</button>
-    <button class="btn-ghost" onclick="showQBank()">Question Bank &amp; Stats</button>
+    <button class="btn-ghost" onclick="showQBank()">Knowledge Question Bank</button>
+    <button class="btn-ghost" onclick="showSQBank()">Safety Question Bank</button>
   </div>
 </div>
 
@@ -343,6 +407,82 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
     <button class="qb-filter" onclick="setQBFilter('unseen',this)">Unseen <span id="fUnseen"></span></button>
   </div>
   <div class="qb-body" id="qbBody"></div>
+</div>
+
+<!-- SAFETY QUIZ -->
+<div id="sqscreen" class="screen">
+  <div class="sq-hd">
+    <div class="sq-meta">
+      <div class="sq-left">
+        <span class="sq-counter" id="sqCounter">Q 1 / 10</span>
+        <span class="sq-scotland" id="sqScotlandPip" style="display:none">Scotland</span>
+        <span class="sq-compulsory" id="sqCompPip" style="display:none">Compulsory</span>
+      </div>
+      <div class="sq-right">
+        <button class="pause-btn" onclick="sqFinish()">Finish</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="sqProgFill" style="width:0%"></div></div>
+  </div>
+  <div class="sq-body">
+    <div class="sq-qnum" id="sqQNum">Question 1</div>
+    <div class="sq-scenario" id="sqScenario" style="display:none">
+      <div class="sq-scenario-lbl">Scenario</div>
+      <div id="sqScenarioText"></div>
+    </div>
+    <div class="sq-qtext" id="sqQText"></div>
+    <div style="margin-top:24px">
+      <button class="sq-reveal-btn" id="sqRevealBtn" onclick="sqReveal()">&#128065; Think about your answer, then reveal &hellip;</button>
+      <div class="sq-answer" id="sqAnswer">
+        <div class="sq-answer-hd">Model Answer</div>
+        <div class="sq-std" id="sqStd"></div>
+        <div id="sqBullets"></div>
+        <div class="sq-confidence">
+          <div class="sq-conf-lbl">How did you do?</div>
+          <div class="sq-conf-btns">
+            <button class="sq-conf-got" onclick="sqRate('got')">&#10003; Got it</button>
+            <button class="sq-conf-needs" onclick="sqRate('needs')">&#10007; Needs work</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SAFETY RESULTS -->
+<div id="sqresults" class="screen">
+  <div class="res-head">
+    <div class="res-icon">&#128221;</div>
+    <div class="res-title" id="sqResTitle">Safety Assessment</div>
+    <div class="res-sub" id="sqResSub">All 10 questions must be answered correctly in the real exam</div>
+  </div>
+  <div class="res-grid" style="margin-bottom:20px">
+    <div class="rbox"><div class="rbox-val g" id="sqResGot">0</div><div class="rbox-lbl">Got it</div></div>
+    <div class="rbox"><div class="rbox-val r" id="sqResNeeds">0</div><div class="rbox-lbl">Needs work</div></div>
+  </div>
+  <div class="sq-summary">
+    <div class="sq-sum-hd">Question by question</div>
+    <div id="sqResList"></div>
+  </div>
+  <div class="res-btns">
+    <button class="btn-primary btn-safety" onclick="startSafetyQuiz()">New Safety Assessment</button>
+    <button class="btn-ghost" onclick="showHome()">Home</button>
+  </div>
+</div>
+
+<!-- SAFETY BANK -->
+<div id="sqbank" class="screen">
+  <div class="qb-hd">
+    <button class="back-btn" onclick="showHome()">&larr; Back</button>
+    <h2>Safety Questions</h2>
+  </div>
+  <div class="qb-filter-row">
+    <button class="qb-filter active" onclick="setSQFilter('all',this)">All <span id="sqfAll"></span></button>
+    <button class="qb-filter" onclick="setSQFilter('needs',this)">Needs Work <span id="sqfNeeds"></span></button>
+    <button class="qb-filter" onclick="setSQFilter('got',this)">Got It <span id="sqfGot"></span></button>
+    <button class="qb-filter" onclick="setSQFilter('unseen',this)">Unseen <span id="sqfUnseen"></span></button>
+  </div>
+  <div class="qb-body" id="sqBankBody"></div>
 </div>
 
 </div>
@@ -1019,6 +1159,607 @@ function showQDetail(i){
   overlay.classList.add('show');
 }
 function closeQDetail(){document.getElementById('qbDetailOverlay').classList.remove('show');}
+
+
+/* ============================================================
+   SAFETY QUESTION BANK (26 questions)
+   scotland: compulsory in Scotland assessments
+   compulsory: compulsory in ALL assessments
+   england: compulsory in England assessments
+   std: DMQ standard (what examiner needs to hear)
+   bullets: model answer bullet points
+     type: 'main'|'sub'|'group' (group = section heading)
+   ============================================================ */
+const SQ = [
+{
+  id:1,
+  q:"A friend asks to examine your new rifle. Demonstrate safe weapon handling.",
+  std:"Demonstrate all four actions correctly",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Demonstrate muzzle awareness at all times"},
+    {t:"Open the bolt"},
+    {t:"Physically check that the chamber and magazine/housing are clear"},
+    {t:"Show the weapon is clear and obtain confirmation before handing it over with bolt open"}
+  ]
+},
+{
+  id:2,
+  q:"How should you carry your rifle while stalking alone in woodland?",
+  std:"Demonstrate all four actions correctly",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Muzzle awareness demonstrated at all times"},
+    {t:"Rifle is fully loaded and charged (safety catch covers this)"},
+    {t:"Safety catch applied and periodically checked"},
+    {t:"Slings and swivels in good working order"}
+  ]
+},
+{
+  id:3,
+  q:"If there are three or more people stalking together, what extra precautions are required? (a) When stalking together, (b) When stalking separately.",
+  std:"Both answers to (a) plus three answers to (b)",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"(a) When stalking together:", type:'group'},
+    {t:"One leader must be nominated from the party"},
+    {t:"Person in front must carry the ONLY loaded rifle"},
+    {t:"(b) When stalking separately:", type:'group'},
+    {t:"Allocate clear areas of operation/boundaries and no straying"},
+    {t:"All party to know where all others are whenever party is split up"},
+    {t:"All aware of how communications are to be used (mobile phones/estate radios)"},
+    {t:"All aware of the designated rendezvous point and time window before emergency procedures"},
+    {t:"All aware of emergency signalling: whistle, rifle shots into safe area, high-vis vest"},
+    {t:"All must know predetermined plan if weather turns bad"},
+    {t:"All must know time of last shot"}
+  ]
+},
+{
+  id:4,
+  q:"You have to crawl to get within range of your quarry. What three safety precautions should you implement?",
+  std:"Correctly give three answers",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Ensure that at no time anyone can get into the line of fire whilst crawling"},
+    {t:"Guard against accidental discharge by approaching with an empty chamber or protecting the safety catch and trigger"},
+    {t:"Protect against an obstructed barrel by using extreme care or using tape to shield the muzzle"}
+  ]
+},
+{
+  id:5,
+  q:"Knives if used incorrectly can easily cause serious accidents. How can the risks be minimised? Give answers for (a) whilst being carried and (b) whilst in use.",
+  std:"Two answers to (a) and two answers to (b)",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"(a) Whilst being carried:", type:'group'},
+    {t:"Ensure that there is a lock blade on any folding knife"},
+    {t:"Never carry opened knife in a pocket"},
+    {t:"Ensure that any fixed blade knife is secured in a sheath"},
+    {t:"Use a sheath with a protective insert or made from impenetrable material"},
+    {t:"(b) Whilst in use:", type:'group'},
+    {t:"Ensure animal is dead before opening or unsheathing a knife"},
+    {t:"Use a sharp and clean knife"},
+    {t:"Never use undue force or haste"},
+    {t:"Cut away from yourself"},
+    {t:"Use protective glove"}
+  ]
+},
+{
+  id:6,
+  q:"What two safety precautions must be observed before climbing into a high seat?",
+  std:"Correctly give both answers",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Check seat for condition — in proper repair, no sabotage or tampering, and secure"},
+    {t:"Unload rifle to climb up or down"}
+  ]
+},
+{
+  id:7,
+  q:"While crawling towards a deer you plug your barrel with mud or frozen snow. What should you do?",
+  std:"Correctly give all four answers",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Unload rifle completely"},
+    {t:"Clear obstruction and clean barrel with correct equipment for the task"},
+    {t:"Reload"},
+    {t:"If cleaning kit is not carried, then abandon the stalk"}
+  ]
+},
+{
+  id:8,
+  q:"You take over the stalking rights on a new piece of ground. Before going out stalking, what must you do?",
+  std:"Both starred answers plus one other",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"★ Study maps and learn exact boundaries"},
+    {t:"★ Find out where high-risk areas are e.g. footpaths, roads, and houses"},
+    {t:"Find out who else might be expected on the ground e.g. farm workers or contractors"},
+    {t:"Where pheasants/farm stock are kept and regularly fed"},
+    {t:"Where ground allows safe shooting and best lines of approach to it"},
+    {t:"Where ground appears unsafe i.e. high seats may be required"}
+  ]
+},
+{
+  id:9,
+  q:"While woodland stalking on your own you encounter a physical obstacle such as a fence or ditch. How do you cross it safely?",
+  std:"All starred actions — negotiating the obstacle is not mandatory",
+  compulsory:true, scotland:false, england:true,
+  bullets:[
+    {t:"★ Unload rifle completely and close bolt having ensured chamber and magazine/housing are clear"},
+    {t:"★ Negotiate the obstacle ensuring rifle is carried or laid down in a safe manner"},
+    {t:"Retrieve rifle"},
+    {t:"★ Reload having checked that the barrel is clear"},
+    {t:"★ Apply safety catch"}
+  ]
+},
+{
+  id:10,
+  q:"You are stalking in forestry with a friend and have to cross a fence — there is no gate. How do you cross it safely?",
+  std:"All starred actions — climbing the fence not mandatory",
+  compulsory:true, scotland:false, england:true,
+  bullets:[
+    {t:"★ Unload rifle completely ensuring chamber and magazine/housing are clear"},
+    {t:"★ Hand rifle to friend with bolt open"},
+    {t:"Climb fence"},
+    {t:"★ Take rifle back and reload and apply safety catch"},
+    {t:"★ Demonstrate muzzle awareness at all times"}
+  ]
+},
+{
+  id:11,
+  q:"Imagine you are stalking. You will be shown a minimum of 4 deer (simulated by cut-out targets) — tell the invigilator whether it would be safe to shoot each, and if not, why not.",
+  std:"All four scenarios to be correctly answered",
+  compulsory:true, scotland:true,
+  bullets:[
+    {t:"Assess each target for a safe backstop — deer on skyline: NO SHOOT"},
+    {t:"Deer in front of unsafe backstops (buildings, roads, ricochet hazards): NO SHOOT"},
+    {t:"Deer in front of other deer: NO SHOOT (risk of through-and-through)"},
+    {t:"Only half visible or obstructed: NO SHOOT"},
+    {t:"One target should have a safe backstop and be in range: SHOOT — heart/lung only"},
+    {t:"Give clear reasons for each decision"},
+    {t:"Only heart and lung shots are acceptable"}
+  ]
+},
+{
+  id:12,
+  q:"You are about to fire your rifle at a deer. What checks should you make before squeezing the trigger to ensure a safe and humane shot?",
+  std:"Correctly answer all four points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Steady shooting position, preferable supported"},
+    {t:"No obstructions in the line of fire"},
+    {t:"Animal stood in a position to allow a humane shot"},
+    {t:"There is a safe backstop immediately behind the animal"}
+  ]
+},
+{
+  id:13,
+  q:"You shoot and the deer runs off before collapsing in long grass. How do you approach it?",
+  std:"Correctly answer all four points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Approach with rifle ready to fire — uncased, loaded with safety catch applied"},
+    {t:"Keep a safe backstop in case you have to shoot again"},
+    {t:"Approach deer whilst always attempting to ascertain the condition of the deer"},
+    {t:"Touch eyeball to ensure no reaction (but not with rifle or finger)"}
+  ]
+},
+{
+  id:14,
+  q:"You fire at a deer, which falls and rolls down a hill. When you approach, it is struggling violently but seems unable to get up. What should you do?",
+  std:"Correctly answer all four points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Keep anyone with you well back"},
+    {t:"Try to stay out of sight and downwind"},
+    {t:"Move round to ensure a safe angle and safe backstop"},
+    {t:"Shoot deer again once a safe despatching shot presents itself"}
+  ]
+},
+{
+  id:15,
+  q:"From the moment a deer is shot it must be treated as food and all contamination avoided. What are the five main sources of contamination?",
+  std:"Any three of the five",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"The bullet"},
+    {t:"The gralloch"},
+    {t:"From the environment"},
+    {t:"From equipment"},
+    {t:"From transport/storage"}
+  ]
+},
+{
+  id:16,
+  q:"Security of firearms and safety in the home is the responsibility of the stalker. Give three major risks.",
+  std:"Candidate must identify the three main areas of risk",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Accidental discharge"},
+    {t:"Theft"},
+    {t:"Unauthorised use"}
+  ]
+},
+{
+  id:17,
+  q:"You are driving home after stalking and stop at a cafe for a meal. If it is absolutely necessary to leave your rifle in an unattended vehicle, what safety precautions must you take?",
+  std:"Correctly answer all four points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Remove bolt and FAC from car and carry with you"},
+    {t:"Take ammunition with you if the quantity involved makes this feasible and appropriate"},
+    {t:"Ideally lock the rifle in the boot, preferably attached to car, but always out of sight"},
+    {t:"Try to park the car in a well-lit area where you can see it"}
+  ]
+},
+{
+  id:18,
+  q:"What measures can you take to reduce safety risks when stalking in popular country areas well used by the general public?",
+  std:"Correctly answer all three points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Take extra precautions at weekends/bank holidays or periods of mass public presence"},
+    {t:"Make maximum use of high seats"},
+    {t:"Extreme vigilance before taking a shot"}
+  ]
+},
+{
+  id:19,
+  q:"When loading a stag carcass into the back of a vehicle, what safety precautions should be taken?",
+  std:"Correctly answer three of the four points",
+  compulsory:false, scotland:false,
+  bullets:[
+    {t:"Restrain deer's head and hooves"},
+    {t:"Lift awkward load correctly with help of another"},
+    {t:"Ensure carcass firmly secured and will not shift or become contaminated in any way"},
+    {t:"Do not overload vehicle in any way"}
+  ]
+},
+{
+  id:20,
+  q:"How should you carry your rifle while hill stalking BEFORE you approach deer to take a shot?",
+  std:"Demonstrate all four actions correctly",
+  compulsory:true, scotland:true,
+  bullets:[
+    {t:"Slings, swivels and attachments on slip are checked to ensure they are in good working order"},
+    {t:"Rifle is fully loaded with bolt carefully closed on an empty chamber"},
+    {t:"Safety catch applied and checked before placing rifle in slip"},
+    {t:"Slip is fastened securely and carried as appropriate"}
+  ]
+},
+{
+  id:21,
+  q:"How should you carry your rifle while hill stalking ONCE you closely approach deer to take a shot?",
+  std:"Demonstrate all four actions correctly",
+  compulsory:true, scotland:true,
+  bullets:[
+    {t:"At an appropriate time during the final approach the rifle is removed from the slip"},
+    {t:"Muzzle awareness demonstrated at all times once weapon is removed from slip"},
+    {t:"Rifle is pointed in a safe direction whilst a round is chambered"},
+    {t:"Safety catch is applied, periodically checked, and only removed when in final position and about to take the shot"}
+  ]
+},
+{
+  id:22,
+  q:"When the deer is confirmed dead, what action would you take with your rifle and ammunition?",
+  std:"Demonstrate all three actions correctly",
+  compulsory:false, scotland:true,
+  bullets:[
+    {t:"Unload rifle completely ensuring chamber and magazine/housing are clear"},
+    {t:"Double check the empty condition of rifle before placing back into slip"},
+    {t:"Place rifle away from work area"}
+  ]
+},
+{
+  id:23,
+  q:"You are going out hill stalking alone. What safety precautions should you take regarding (a) planning and preparation, and (b) equipment?",
+  std:"Five points from part (a) and seven points from part (b)",
+  compulsory:false, scotland:true,
+  bullets:[
+    {t:"(a) Planning & preparation:", type:'group'},
+    {t:"Assess weather conditions and time available"},
+    {t:"Choose an appropriate area"},
+    {t:"Take radio or mobile telephone communications"},
+    {t:"Leave details of route or area to be stalked with someone"},
+    {t:"Give your expected time of return"},
+    {t:"Detail when to worry and seek help if you do not return"},
+    {t:"Be prepared to come home immediately if the weather turns nasty"},
+    {t:"Know your own limitations and plan accordingly"},
+    {t:"Always stick to your plan"},
+    {t:"(b) Equipment:", type:'group'},
+    {t:"Warm clothes"},
+    {t:"Waterproof clothes"},
+    {t:"Sustaining food/hot drink"},
+    {t:"Compass"},
+    {t:"Map"},
+    {t:"Torch"},
+    {t:"Flares"},
+    {t:"Survival blanket"},
+    {t:"Mobile phone"},
+    {t:"Small first aid kit"},
+    {t:"Whistle"}
+  ]
+},
+{
+  id:24,
+  q:"If your stalking companion becomes unable to walk further through injury or exhaustion in bad weather on the hill (no mobile phone signal), what should you do?",
+  std:"Correctly give all answers",
+  compulsory:false, scotland:true,
+  bullets:[
+    {t:"Give first aid"},
+    {t:"If possible get him to some sort of shelter"},
+    {t:"Give him plenty of clothes, warm drink or food"},
+    {t:"If he cannot go on and is NOT delirious, make him comfortable and reassure him"},
+    {t:"Tell him to stay put and go to get help"},
+    {t:"If he is delirious, stay with him until help arrives unless he may die before then — in which case risk leaving him to seek assistance"},
+    {t:"If you leave, note and mark his location and record the OS grid reference"}
+  ]
+},
+{
+  id:25,
+  q:"While hill stalking on your own you encounter a physical obstacle such as a fence or ditch. How do you cross it safely?",
+  std:"All starred actions — negotiating the obstacle is not mandatory",
+  compulsory:true, scotland:true,
+  bullets:[
+    {t:"★ Unload rifle completely and close bolt having ensured chamber and magazine/housing are clear"},
+    {t:"★ Negotiate the obstacle ensuring rifle is carried or laid down in a safe manner"},
+    {t:"Retrieve rifle"},
+    {t:"★ Reload having checked that the barrel is clear"},
+    {t:"★ Apply safety catch"}
+  ]
+},
+{
+  id:26,
+  q:"You are stalking on the hill with a friend and have to cross a fence — there is no gate. How do you cross it safely?",
+  std:"All starred actions — climbing the fence not mandatory",
+  compulsory:true, scotland:true,
+  bullets:[
+    {t:"★ Unload rifle completely ensuring chamber and magazine/housing are clear"},
+    {t:"★ Hand rifle to friend with bolt open"},
+    {t:"Climb fence"},
+    {t:"★ Take rifle back and reload and apply safety catch"},
+    {t:"★ Demonstrate muzzle awareness at all times"}
+  ]
+}
+];
+
+/* ============================================================
+   SAFETY QUIZ STATE
+   ============================================================ */
+const SQK = {conf:'dsc1_sq_conf'}; // {qId: 'got'|'needs'}
+let sqSession = []; // array of question ids for this session
+let sqCurrent = 0;
+let sqRatings = {}; // {qId: 'got'|'needs'|'skipped'}
+
+function sqLoad(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function sqSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ============================================================
+   START SAFETY QUIZ
+   ============================================================ */
+function startSafetyQuiz(){
+  // Build a 10-question session
+  // Prioritise: unseen > needs work > got it, but always include compulsory if Scotland context
+  const conf = sqLoad(SQK.conf)||{};
+  const needs = [], unseen = [], got = [];
+  SQ.forEach(q=>{
+    const r = conf[q.id];
+    if(!r) unseen.push(q.id);
+    else if(r==='needs') needs.push(q.id);
+    else got.push(q.id);
+  });
+  // Shuffle each tier
+  const shuf = a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;};
+  const pool = [...shuf(needs), ...shuf(unseen), ...shuf(got)];
+  sqSession = pool.slice(0,10);
+  sqCurrent = 0;
+  sqRatings = {};
+  show('sqscreen');
+  sqRender();
+}
+
+/* ============================================================
+   RENDER SAFETY QUESTION
+   ============================================================ */
+function sqRender(){
+  const qid = sqSession[sqCurrent];
+  const q = SQ.find(x=>x.id===qid);
+  const total = sqSession.length;
+
+  document.getElementById('sqProgFill').style.width = ((sqCurrent/total)*100)+'%';
+  document.getElementById('sqCounter').textContent = 'Q '+(sqCurrent+1)+' / '+total;
+  document.getElementById('sqQNum').textContent = 'Safety Question '+q.id;
+
+  // Scotland / compulsory pips
+  document.getElementById('sqScotlandPip').style.display = q.scotland ? 'inline-block' : 'none';
+  document.getElementById('sqCompPip').style.display = q.compulsory ? 'inline-block' : 'none';
+
+  document.getElementById('sqQText').textContent = q.q;
+
+  // Hide answer, reset reveal button
+  document.getElementById('sqAnswer').classList.remove('visible');
+  document.getElementById('sqRevealBtn').style.display = 'block';
+  document.getElementById('sqRevealBtn').textContent = '\uD83D\uDC41 Think about your answer, then reveal\u2026';
+
+  // DMQ standard
+  document.getElementById('sqStd').textContent = 'DMQ Standard: ' + q.std;
+
+  // Bullets
+  let bHtml = '';
+  q.bullets.forEach(b=>{
+    if(b.type==='group'){
+      bHtml += `<div class="sq-bullet" style="padding-top:12px"><span style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em">${b.t}</span></div>`;
+    } else {
+      bHtml += `<div class="sq-bullet"><span class="sq-bullet-dot">&#8250;</span><span>${b.t}</span></div>`;
+    }
+  });
+  document.getElementById('sqBullets').innerHTML = bHtml;
+
+  document.querySelector('.sq-body').scrollTop = 0;
+}
+
+/* ============================================================
+   REVEAL ANSWER
+   ============================================================ */
+function sqReveal(){
+  document.getElementById('sqRevealBtn').style.display = 'none';
+  document.getElementById('sqAnswer').classList.add('visible');
+}
+
+/* ============================================================
+   RATE CONFIDENCE
+   ============================================================ */
+function sqRate(rating){
+  const qid = sqSession[sqCurrent];
+  sqRatings[qid] = rating;
+  // Persist confidence
+  const conf = sqLoad(SQK.conf)||{};
+  conf[qid] = rating;
+  sqSave(SQK.conf, conf);
+  // Next or results
+  if(sqCurrent < sqSession.length - 1){
+    sqCurrent++;
+    sqRender();
+  } else {
+    sqShowResults();
+  }
+}
+
+/* ============================================================
+   FINISH EARLY
+   ============================================================ */
+function sqFinish(){
+  // Mark any remaining as skipped
+  for(let i = sqCurrent; i < sqSession.length; i++){
+    if(!sqRatings[sqSession[i]]) sqRatings[sqSession[i]] = 'skipped';
+  }
+  sqShowResults();
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function sqShowResults(){
+  let got=0, needs=0, skipped=0;
+  const entries = sqSession.map(qid=>{
+    const q = SQ.find(x=>x.id===qid);
+    const r = sqRatings[qid]||'skipped';
+    if(r==='got') got++;
+    else if(r==='needs') needs++;
+    else skipped++;
+    return {q, r};
+  });
+
+  document.getElementById('sqResGot').textContent = got;
+  document.getElementById('sqResNeeds').textContent = needs;
+
+  const allGot = got === sqSession.length;
+  document.getElementById('sqResTitle').textContent = allGot ? 'Excellent!' : 'Keep Practising';
+  document.getElementById('sqResSub').textContent = allGot
+    ? 'All questions answered correctly — real exam standard!'
+    : 'All 10 questions must be answered correctly in the real assessment.';
+
+  let listHtml = '';
+  entries.forEach(({q,r})=>{
+    const tag = r==='got'
+      ? '<span class="sq-sum-tag got">&#10003; Got it</span>'
+      : r==='needs'
+      ? '<span class="sq-sum-tag needs">&#10007; Needs work</span>'
+      : '<span class="sq-sum-tag skipped">Skipped</span>';
+    listHtml += `<div class="sq-sum-row"><span class="sq-sum-q">Q${q.id}. ${q.q.substring(0,70)}${q.q.length>70?'&hellip;':''}</span>${tag}</div>`;
+  });
+  document.getElementById('sqResList').innerHTML = listHtml;
+  show('sqresults');
+}
+
+/* ============================================================
+   SAFETY QUESTION BANK
+   ============================================================ */
+let sqBankFilter = 'all';
+
+function showSQBank(){
+  sqBankFilter = 'all';
+  renderSQBank();
+  show('sqbank');
+}
+
+function setSQFilter(f, btn){
+  sqBankFilter = f;
+  document.querySelectorAll('#sqbank .qb-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSQBankList();
+}
+
+function renderSQBank(){
+  const conf = sqLoad(SQK.conf)||{};
+  let total=0, needs=0, got=0, unseen=0;
+  SQ.forEach(q=>{
+    total++;
+    const r = conf[q.id];
+    if(!r) unseen++;
+    else if(r==='needs') needs++;
+    else got++;
+  });
+  document.getElementById('sqfAll').textContent='('+total+')';
+  document.getElementById('sqfNeeds').textContent='('+needs+')';
+  document.getElementById('sqfGot').textContent='('+got+')';
+  document.getElementById('sqfUnseen').textContent='('+unseen+')';
+  renderSQBankList();
+}
+
+function renderSQBankList(){
+  const conf = sqLoad(SQK.conf)||{};
+  let html = '';
+  let count = 0;
+  SQ.forEach(q=>{
+    const r = conf[q.id];
+    if(sqBankFilter==='needs' && r!=='needs') return;
+    if(sqBankFilter==='got' && r!=='got') return;
+    if(sqBankFilter==='unseen' && r) return;
+    count++;
+    const cls = !r ? 'unseen' : r==='needs' ? 'needs' : 'got';
+    const icon = !r ? '&mdash;' : r==='needs' ? '&times;' : '&check;';
+    const tally = !r
+      ? '<div class="sq-bank-tally">Not yet attempted</div>'
+      : `<div class="sq-bank-tally">${r==='got'?'&#10003; Got it':'&#10007; Needs work'} &mdash; last rated</div>`;
+    const flags = (q.compulsory?'<span class="sq-bank-flag comp">Compulsory</span>':'') +
+                  (q.scotland?'<span class="sq-bank-flag">Scotland</span>':'');
+    html += `<div class="sq-bank-item ${cls}" onclick="showSQDetail(${q.id})">
+      <div class="sq-bank-status ${cls}">${icon}</div>
+      <div class="sq-bank-info">
+        <div class="sq-bank-qnum">Q${q.id} ${flags}</div>
+        <div class="sq-bank-qtext">${q.q}</div>
+        ${tally}
+      </div>
+    </div>`;
+  });
+  if(count===0) html='<div style="color:var(--text3);text-align:center;padding:40px 20px;font-size:15px">No questions in this category yet.</div>';
+  document.getElementById('sqBankBody').innerHTML = html;
+}
+
+function showSQDetail(id){
+  const q = SQ.find(x=>x.id===id);
+  // Reuse the qb detail overlay with safety question content
+  const overlay = document.getElementById('qbDetailOverlay');
+  document.getElementById('qbDetailQnum').textContent = 'Safety Question '+q.id+(q.scotland?' · Scotland':'')+(q.compulsory?' · Compulsory':'');
+  document.getElementById('qbDetailQ').textContent = q.q;
+  let bHtml='';
+  q.bullets.forEach(b=>{
+    if(b.type==='group'){
+      bHtml+=`<div class="sq-bullet" style="padding-top:10px"><span style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase">${b.t}</span></div>`;
+    } else {
+      bHtml+=`<div class="sq-bullet"><span class="sq-bullet-dot">&#8250;</span><span style="font-size:14px;color:var(--text);line-height:1.45">${b.t}</span></div>`;
+    }
+  });
+  // Inject std before bullets
+  bHtml = `<div class="sq-std" style="margin-bottom:14px">DMQ Standard: ${q.std}</div>` + bHtml;
+  document.getElementById('qbDetailOpts').innerHTML = bHtml;
+  document.getElementById('qbDetailC').textContent = '—';
+  document.getElementById('qbDetailW').textContent = '—';
+  overlay.classList.add('show');
+}
+
 
 /* ============================================================
    INIT

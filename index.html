@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DSC1 Quiz">
+<title>DSC1 Quiz</title>
+<style>
+:root{
+  --bg:#0d0f0e;--surf:#161a17;--surf2:#1e2420;--border:#2a3230;
+  --acc:#4caf78;--acc-dim:#1e4a32;--acc-text:#051008;
+  --danger:#e05552;--danger-dim:#4a1a1a;
+  --text:#e8ede9;--text2:#8a9e8e;--text3:#4a5e4e;
+  --correct:#4caf78;--wrong:#e05552;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none}
+#app{height:100%;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;height:100%}
+.screen.active{display:flex}
+
+/* HOME */
+#home{padding:calc(var(--safe-top) + 48px) 22px calc(var(--safe-bot) + 32px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.home-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc-dim);padding:5px 13px;border-radius:100px;margin-bottom:14px}
+.home-title{font-size:36px;line-height:1.1;color:var(--text);margin-bottom:10px;font-weight:300;letter-spacing:-.5px}
+.home-title strong{font-weight:700;color:var(--acc)}
+.home-sub{font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-box{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
+.stat-val{font-size:24px;font-weight:700;color:var(--acc)}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.07em}
+.mode-card{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px}
+.mode-hd{font-size:11px;color:var(--text3);margin-bottom:12px;font-weight:700;text-transform:uppercase;letter-spacing:.09em}
+.tog-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tog-label{font-size:14px;color:var(--text);flex:1;line-height:1.4}
+.tog-label small{display:block;font-size:12px;color:var(--text3);margin-top:2px}
+.tog{position:relative;width:48px;height:28px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;background:var(--surf2);border-radius:14px;border:1px solid var(--border);transition:background .2s,border-color .2s;cursor:pointer}
+.tog-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--text3);border-radius:50%;transition:transform .2s,background .2s;pointer-events:none}
+input:checked~.tog-track{background:var(--acc-dim);border-color:var(--acc)}
+input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
+.resume-banner{background:var(--acc-dim);border:1px solid var(--acc);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.resume-info{font-size:14px;color:var(--acc);line-height:1.4}
+.resume-info strong{display:block;font-size:15px;font-weight:700;margin-bottom:2px}
+.resume-btns{display:flex;gap:8px;flex-shrink:0}
+.btn-sm{font-size:13px;font-weight:700;border-radius:10px;padding:8px 14px;cursor:pointer;border:none}
+.btn-sm.green{background:var(--acc);color:var(--acc-text)}
+.btn-sm.ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.recent-hd{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-weight:700}
+.recent-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.recent-row:last-child{border-bottom:none}
+.recent-date{color:var(--text2)}
+.recent-score.pass{font-weight:700;color:var(--correct)}
+.recent-score.fail{font-weight:700;color:var(--wrong)}
+.home-btns{margin-top:22px}
+.btn-primary{background:var(--acc);color:var(--acc-text);font-size:17px;font-weight:700;border:none;border-radius:14px;padding:18px;width:100%;cursor:pointer;transition:opacity .15s;margin-bottom:10px}
+.btn-primary:active{opacity:.8}
+.btn-ghost{background:transparent;color:var(--text2);font-size:15px;font-weight:500;border:1px solid var(--border);border-radius:14px;padding:14px;width:100%;cursor:pointer;transition:background .15s}
+.btn-ghost:active{background:var(--surf2)}
+
+/* QUIZ */
+#quiz{background:var(--bg)}
+.quiz-hd{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.quiz-left{display:flex;align-items:center;gap:8px}
+.quiz-counter{font-size:13px;color:var(--text2);font-weight:600}
+.weight-pip{font-size:11px;color:var(--acc);background:var(--acc-dim);padding:2px 8px;border-radius:100px;font-weight:700}
+.quiz-right{display:flex;gap:8px}
+.pause-btn{font-size:13px;color:var(--text2);background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:600}
+.finish-btn{font-size:13px;color:var(--danger);background:transparent;border:1px solid var(--danger-dim);border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:600}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s ease}
+.quiz-body{flex:1;overflow-y:auto;padding:22px 18px calc(var(--safe-bot) + 22px);-webkit-overflow-scrolling:touch}
+.q-num{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:700}
+.q-text{font-size:19px;line-height:1.45;color:var(--text);margin-bottom:24px;font-weight:400}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{display:flex;align-items:flex-start;gap:12px;padding:15px 16px;background:var(--surf);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none}
+.option:active{background:var(--surf2)}
+.opt-letter{width:28px;height:28px;border-radius:50%;background:var(--surf2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--text3);flex-shrink:0;transition:all .15s;margin-top:1px}
+.opt-text{font-size:15px;line-height:1.5;color:var(--text);flex:1}
+.option.correct{border-color:var(--correct);background:rgba(76,175,120,.13)}
+.option.correct .opt-letter{background:var(--acc-dim);border-color:var(--correct);color:var(--correct)}
+.option.wrong{border-color:var(--wrong);background:rgba(224,85,82,.1)}
+.option.wrong .opt-letter{background:var(--danger-dim);border-color:var(--wrong);color:var(--wrong)}
+.option.reveal-correct{border-color:var(--correct);background:rgba(76,175,120,.13)}
+.option.reveal-correct .opt-letter{background:var(--acc-dim);border-color:var(--correct);color:var(--correct)}
+.next-btn{margin-top:20px;width:100%;background:var(--acc);color:var(--acc-text);font-size:16px;font-weight:700;border:none;border-radius:14px;padding:17px;cursor:pointer;display:none;transition:opacity .15s}
+.next-btn.visible{display:block}
+.next-btn:active{opacity:.8}
+
+/* PAUSED */
+#paused{background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:40px 28px}
+.paused-icon{font-size:56px}
+.paused-title{font-size:26px;font-weight:700;text-align:center}
+.paused-info{font-size:15px;color:var(--text2);text-align:center;line-height:1.6;max-width:300px}
+.paused-btns{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+
+/* RESULTS */
+#results{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--safe-top) + 20px) 22px calc(var(--safe-bot) + 36px)}
+.res-head{text-align:center;padding:8px 0 20px}
+.res-icon{font-size:52px;margin-bottom:10px}
+.res-title{font-size:30px;font-weight:700;margin-bottom:5px}
+.res-sub{font-size:14px;color:var(--text2)}
+.ring-wrap{display:flex;justify-content:center;margin:18px 0}
+.ring{position:relative;width:130px;height:130px}
+.ring svg{transform:rotate(-90deg)}
+.ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-size:32px;font-weight:700;line-height:1}
+.ring-frac{font-size:13px;color:var(--text2);margin-top:2px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.rbox{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.rbox-val{font-size:24px;font-weight:700}
+.rbox-val.g{color:var(--correct)}.rbox-val.r{color:var(--wrong)}.rbox-val.w{color:var(--text)}.rbox-val.d{color:var(--text2)}
+.rbox-lbl{font-size:11px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.pass-banner{background:rgba(76,175,120,.1);border:1px solid var(--acc-dim);border-radius:14px;padding:14px;text-align:center;margin-bottom:18px;color:var(--acc);font-size:14px;font-weight:600}
+.fail-banner{background:rgba(224,85,82,.08);border:1px solid var(--danger-dim);border-radius:14px;padding:14px;text-align:center;margin-bottom:18px;color:var(--danger);font-size:14px;font-weight:600}
+.review-hd{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;font-weight:700}
+.review-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:10px}
+.rev-q{font-size:14px;color:var(--text);line-height:1.45;margin-bottom:10px}
+.rev-a{display:flex;gap:8px;font-size:13px;margin-bottom:4px;align-items:flex-start}
+.rev-lbl{color:var(--text3);min-width:62px;flex-shrink:0}
+.rev-wrong{color:var(--wrong)}.rev-right{color:var(--correct)}
+.res-btns{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+
+/* HISTORY */
+#history{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--safe-top) + 20px) 22px calc(var(--safe-bot) + 36px)}
+.hist-hd{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.back-btn{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:14px;color:var(--text2);cursor:pointer}
+.hist-hd h2{font-size:26px;font-weight:700}
+.hist-empty{color:var(--text3);font-size:15px;text-align:center;margin-top:60px}
+.hist-row{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hr-left{display:flex;flex-direction:column;gap:3px}
+.hr-date{font-size:13px;color:var(--text2)}
+.hr-detail{font-size:12px;color:var(--text3)}
+.hr-score{font-size:22px;font-weight:700}
+.hr-score.pass{color:var(--correct)}.hr-score.fail{color:var(--wrong)}
+.clear-btn{margin-top:20px;width:100%;background:transparent;color:var(--wrong);border:1px solid var(--danger-dim);border-radius:14px;padding:14px;font-size:15px;cursor:pointer}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:200;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:26px 22px;width:100%;max-width:340px}
+.modal h3{font-size:20px;font-weight:700;margin-bottom:8px}
+.modal p{font-size:14px;color:var(--text2);line-height:1.55;margin-bottom:22px}
+.modal-btns{display:flex;gap:10px}
+.m-cancel{flex:1;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:15px;cursor:pointer}
+.m-confirm{flex:1;background:var(--danger);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-badge">DSC Level 1</div>
+  <div class="home-title">Deer Stalking<br><strong>Certificate Quiz</strong></div>
+  <div class="home-sub">40 randomised questions &middot; exam simulation<br>Real exam pass mark: 75%</div>
+  <div id="resumeBanner"></div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-val" id="sAttempts">0</div><div class="stat-lbl">Attempts</div></div>
+    <div class="stat-box"><div class="stat-val" id="sBest">&mdash;</div><div class="stat-lbl">Best</div></div>
+    <div class="stat-box"><div class="stat-val" id="sAvg">&mdash;</div><div class="stat-lbl">Avg</div></div>
+  </div>
+  <div class="mode-card">
+    <div class="mode-hd">Quiz Mode</div>
+    <div class="tog-row">
+      <div class="tog-label">
+        Weighted mode
+        <small>Questions you get wrong appear more often</small>
+      </div>
+      <label class="tog">
+        <input type="checkbox" id="weightedToggle">
+        <div class="tog-track"></div>
+        <div class="tog-thumb"></div>
+      </label>
+    </div>
+  </div>
+  <div id="recentList"></div>
+  <div class="home-btns">
+    <button class="btn-primary" onclick="startQuiz()">Start New Quiz</button>
+    <button class="btn-ghost" onclick="showHistory()">View Score History</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-hd">
+    <div class="quiz-meta">
+      <div class="quiz-left">
+        <span class="quiz-counter" id="quizCounter">Q 1 / 40</span>
+        <span class="weight-pip" id="weightPip" style="display:none">Weighted</span>
+      </div>
+      <div class="quiz-right">
+        <button class="pause-btn" onclick="pauseQuiz()">&#9646;&#9646; Pause</button>
+        <button class="finish-btn" onclick="confirmFinish()">Finish</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="quiz-body">
+    <div class="q-num" id="qNum">Question 1</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="options"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question &rarr;</button>
+  </div>
+</div>
+
+<!-- PAUSED -->
+<div id="paused" class="screen">
+  <div class="paused-icon">&#9646;&#9646;</div>
+  <div class="paused-title">Quiz Paused</div>
+  <div class="paused-info" id="pausedInfo">Your progress is saved. Resume whenever you're ready.</div>
+  <div class="paused-btns">
+    <button class="btn-primary" onclick="resumeSaved()">Resume Quiz</button>
+    <button class="btn-ghost" onclick="abandonQuiz()">Abandon &amp; Go Home</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="res-head">
+    <div class="res-icon" id="resIcon">&#127919;</div>
+    <div class="res-title" id="resTitle">Quiz Complete</div>
+    <div class="res-sub" id="resSub"></div>
+  </div>
+  <div class="ring-wrap">
+    <div class="ring">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="54" fill="none" stroke="#2a3230" stroke-width="9"/>
+        <circle cx="65" cy="65" r="54" fill="none" id="ringArc" stroke="#4caf78" stroke-width="9"
+          stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+      </svg>
+      <div class="ring-txt">
+        <div class="ring-pct" id="ringPct">0%</div>
+        <div class="ring-frac" id="ringFrac">0/40</div>
+      </div>
+    </div>
+  </div>
+  <div id="passBanner"></div>
+  <div class="res-grid">
+    <div class="rbox"><div class="rbox-val g" id="rCorrect">0</div><div class="rbox-lbl">Correct</div></div>
+    <div class="rbox"><div class="rbox-val r" id="rWrong">0</div><div class="rbox-lbl">Wrong</div></div>
+    <div class="rbox"><div class="rbox-val w" id="rAnswered">0</div><div class="rbox-lbl">Answered</div></div>
+    <div class="rbox"><div class="rbox-val d" id="rSkipped">0</div><div class="rbox-lbl">Not Reached</div></div>
+  </div>
+  <div id="reviewSection"></div>
+  <div class="res-btns">
+    <button class="btn-primary" onclick="startQuiz()">New Quiz</button>
+    <button class="btn-ghost" onclick="showHome()">Home</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="screen">
+  <div class="hist-hd">
+    <button class="back-btn" onclick="showHome()">&larr; Back</button>
+    <h2>History</h2>
+  </div>
+  <div id="histList"></div>
+</div>
+
+</div>
+
+<!-- FINISH MODAL -->
+<div class="modal-overlay" id="finishModal">
+  <div class="modal">
+    <h3>Finish Early?</h3>
+    <p>You'll be scored on the questions you've answered so far. Unanswered questions won't count.</p>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeModal('finishModal')">Continue</button>
+      <button class="m-confirm" onclick="finishEarly()">Finish Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   QUESTION BANK  (283 questions, answers are index into opts)
+   ============================================================ */
+const QB=[
+{q:"What are normally the last deer to change from winter coat into summer coat?",o:["Male deer","Young deer","Female deer","Old deer"],a:3},
+{q:"Which male antlered deer usually cast their antlers first?",o:["Kids","Old animals","Perruques","Yearlings"],a:1},
+{q:"Under what circumstances do female deer usually give birth to their young?",o:["In the middle of the herd for protection","Quietly and alone in cover","Out in the open where she can see danger approaching","With the buck in close attendance waiting to breed afterwards"],a:1},
+{q:"The antler casting cycle is mainly governed by which hormone?",o:["Adrenaline","Testosterone","Progesterone","Oestrogen"],a:1},
+{q:"For a few days after their birth, young deer generally:",o:["Are left alone in cover by their mothers between suckling bouts","Run with their mothers from an hour or two after birth","Join in groups with other newly born deer","Are led to low ground without delay"],a:0},
+{q:"A female deer will not conceive unless:",o:["She is in her home range","She reaches a certain threshold body weight","She is at least 4 years old","She has been covered by at least two males"],a:1},
+{q:"What is the primary limiting factor of a deer's life span?",o:["Loss of its territory","Being killed by other deer","Its teeth wearing out so that it cannot feed efficiently","The strain of growing antlers or producing young"],a:2},
+{q:"A buck whose antlers in season are a spongy mass of velvet (a perruque head) should:",o:["Be culled as it may become infected and he will probably die","Be protected and must not be shot","Be preserved as good breeding stock","Soon come into hard antler and produce a normal head"],a:0},
+{q:"Why do deer ruminate?",o:["It helps them to rest","It is essential to their digestion","It is a reaction to stress","It eliminates indigestible food"],a:1},
+{q:"What is the preferred habitat of most species of deer in the United Kingdom?",o:["Woodland margins","Moorland","Pasture","Wetlands"],a:0},
+{q:"The effect of rising numbers of deer in an area is likely to be first noticed through?",o:["Reduced diversity of plants at ground level and increased crop damage","Reduced birth rate","Increased antler quality","Reduced birth weight"],a:0},
+{q:"How are deer wallows best described?",o:["Pure and sweet smelling","Dry and dusty","Muddy and often scented with urine","Rocky with fast flowing water"],a:2},
+{q:"Deer under normal undisturbed conditions will:",o:["Feed continuously all day long","Only feed at night","Feed in cycles of a few hours with peaks at dawn/dusk","Only feed in daylight"],a:2},
+{q:"Deer are rarely seen to drink. This is because:",o:["They drink once every few days","They get most of the water they need from their food","In hot weather they stay in the shade","They only drink at night"],a:1},
+{q:"Scent glands in most UK deer are located:",o:["Behind the ears and under the chin","Between hooves, in corner of eye and outside hock","All along the neck and spine","On their chest and shoulders"],a:1},
+{q:"Fraying is the term used to describe which activity of a male deer?",o:["Rubbing the bark from trees and shrubs with antlers","Eating the bark of trees and shrubs","Making territorial marks on the ground using hooves","Changing coat"],a:0},
+{q:"What is the term used to describe the covering of a deer's growing antlers?",o:["Guard hair","Under coat/fur","Velvet","Bare skin"],a:2},
+{q:"A reasonable estimation of the age class of a deer when it has been killed can be gained from:",o:["The number of points on its antler","The amount of fat around its kidneys","The amount of wear on its hooves","The amount of wear on its teeth"],a:3},
+{q:"'Browsing' is the term which describes:",o:["Deer feeding on leaves and buds","Deer feeding on grass and herbs","Deer raiding cereal crops","Deer eating root crop"],a:0},
+{q:"Where are a deer's antlers shed and regrown from each year?",o:["The burr","The coronet","The pedicle","The beam"],a:2},
+{q:"Which of the following descriptions apply to deer droppings?",o:["Often black or dark brown, shiny when fresh often with ends pointed or indented","Always perfectly cylindrical","Always round and fibrous","Pale in colour and similar to small fox droppings"],a:0},
+{q:"After the shot, a deer hunches its back and walks slowly into cover. This is a typical reaction from an animal which has been hit in:",o:["The heart","The lungs","The gut","The neck"],a:2},
+{q:"If you suspect that you have wounded a deer and it has disappeared from sight, what should you do?",o:["Wait for 10-15 minutes before going forward to the place where it was standing when you shot","Wait for 1 minute before going forward to the place it was standing when shot","Go straight to where you last saw it before it disappeared","Go round behind where you last saw it and approach the place from there"],a:0},
+{q:"After the shot, the deer kicks out its hind legs and rushes into cover with neck outstretched. Traces of pink and frothy blood are found. Where has it been hit?",o:["The heart","The lungs","The liver","The kidneys"],a:1},
+{q:"After a shot, the deer falls down and gets up almost immediately or staggers before rushing away. Only a few drops of blood, some short hair and a long splinter of bone is found. Where has it been hit?",o:["The gut","The lungs","The leg","The spine"],a:2},
+{q:"You are stalking in woodland and spot a deer from about 40 metres behind a large tree. All you can see is the animal's head looking sideways. What is the recommended procedure?",o:["Shoot at its eye","Wait until it exposes the chest area and take a heart/lung shot","Shoot at a point half way between the eye and base of the ear","Make a noise so it looks at you before shooting it between the eyes"],a:1},
+{q:"Which is the best point of aim to ensure a humane kill at most sensible distances?",o:["The centre of the head","Half way up the body just behind the shoulder","High in the neck","Low in the neck"],a:1},
+{q:"If you intend to shoot one deer, how much ammunition should you carry whilst stalking?",o:["One round loaded in the rifle","One round loaded in the rifle and one in the pocket","One round loaded in the rifle and one in the magazine","One round loaded in the rifle, more than one in the magazine and some spare in the pocket"],a:3},
+{q:"What is the main purpose of stalking to within easy range of a deer?",o:["To ensure a humane kill","To check the quality of the antlers before taking the shot","To test the stalker's ability to get in close","To increase the chances of spotting an additional shootable deer"],a:0},
+{q:"What is the advantage of a telescopic sight?",o:["Very long shots can be taken with ease","You can aim more precisely at all ranges","You do not need to carry binoculars to identify the deer","It enables you to see and shoot the deer through undergrowth"],a:1},
+{q:"Within woodlands, at what range are the majority of deer shot?",o:["Under 100 metres","100-150 metres","150-200 metres","200-300 metres"],a:0},
+{q:"A wounded stag is struggling hard but seems unable to run away and could possibly be approached. Should it be?",o:["Returned to later, accompanied by a dog","Shot again if safe to do so","Left to die in peace","Held down to be finished off with a knife"],a:1},
+{q:"When a deer drops instantly to the shot, what should you do?",o:["Rush up to it ready to finish it off if it's not dead","Immediately shoot at it again where it lies","Remain where you are, ready to shoot again and observe the animal","Unload and prepare to gralloch because it is dead for sure"],a:2},
+{q:"After successfully shooting a deer from a group, what should you do?",o:["Stay still until the remaining deer in the immediate area have moved out of sight","Stand up and frighten the rest of the deer away quickly","Rush up and bleed the carcass before the heart has stopped beating","Drag the carcass away from the other deer as soon as possible"],a:0},
+{q:"Which of the following factors are most important for safety in the choice of a stalker's knife?",o:["Non-slip handle","Curved blade for skinning","Appearance","Serrated blade for cutting through bone"],a:0},
+{q:"Which of the following items is the most important for a sensible stalker to carry with him whilst out stalking?",o:["A pull through and cleaning patch","A box of matches","A bottle of gun oil","A screwdriver"],a:0},
+{q:"What is the advantage in using a high seat?",o:["The deer may not see the stalker","The deer may not smell the stalker","The shot is likely to be safer than one taken from ground level","All of the above"],a:3},
+{q:"When stalking alone on leased ground, which of the following is essential to carry?",o:["Certificate of insurance","Legal deer seasons menu card","Spare targets","Permission to stalk signed by the landowner/occupier or holder of the stalking right"],a:3},
+{q:"The use of a stick (or split sticks) as a stalking aid is:",o:["Sensible because it makes shooting and spying steadier","Unsporting because it makes shooting too easy","Unnecessary because it is easier and quicker to shoot freehand","Tiring because it is one more heavy and awkward thing to carry"],a:0},
+{q:"You are on a steep bank above a deer. Which shooting position is likely to be the most comfortable and stable?",o:["Prone","Sitting","Freehand","Standing"],a:1},
+{q:"When should the bolt be removed from the rifle whilst stored in the home?",o:["All the time to avoid its use by an unauthorised person e.g. child/thief","Only when you wish to clean the bolt","Only when necessary to avoid a build-up of condensation","Occasionally to ease pressure on the striker spring"],a:0},
+{q:"When should you take off the safety catch whilst deer stalking?",o:["When you load the rifle and set off with it safely slung over your shoulder","When you start the final approach on a stalk","When you enter thick cover and silence is essential","When you are in the aim and about to squeeze the trigger"],a:3},
+{q:"Someone offers you a rifle with the bolt closed. What should you do?",o:["Refuse to accept the rifle until he/she proves that it is unloaded","Take the rifle and ask him/her if it is loaded before pulling the trigger to check","Point it in a safe direction and pull the trigger to check","Open the bolt and look inside to prove it empty"],a:3},
+{q:"When shooting deer in woods or on level ground safety can be improved by?",o:["Lying down to take every shot","Using a high seat","Only shooting at deer with a screen of bushes behind them to break up the bullets","Only shooting into open spaces e.g. down rides"],a:1},
+{q:"If you accidentally plug your barrel with peat or snow, what should you do?",o:["Fire a shot to clear it","Carry on and take more care of your rifle","Unload all cartridges at once and properly clean the bore","Push the obstruction down the barrel as far from the muzzle as possible"],a:2},
+{q:"When approaching a deer you have shot and believe to be dead, what should your first action be?",o:["Stick a knife into the base of the neck to bleed it","Make sure it is dead by touching an eyeball and watching for 'eye-blink' reaction","Grab the back leg to restrain it in case it is still alive","Shoot it in the head to make sure it is dead"],a:1},
+{q:"If you have to shoot an injured deer at close range, what should you do?",o:["Lie down to ensure a steady shot at the neck outlined clearly against the sky","Get close enough so you can rest the rifle muzzle against the deer's skin","Ensure there is a soft safe backstop behind the deer to stop the bullet","Get someone to hold a leg to keep the animal still"],a:1},
+{q:"A safe backstop is required before you take a shot at a deer. What is the best form of backstop?",o:["Clear air, i.e. a silhouette target with nothing behind the deer","A dense screen of bushes and scrub which will absorb the bullet","A belt of trees or a thick plantation","A rising bank of soft ground"],a:3},
+{q:"When stalking deer in thick cover should you?",o:["Use a slow, heavy calibre bullet to cut through the twigs and underbrush","Use a fast light calibre bullet to cut through the twigs and underbrush","Use solid (full metal jacket) bullets to avoid bullet break-up on twigs","Not take any shots at deer that are not fully visible and without a safe backstop"],a:3},
+{q:"What is the maximum distance that a bullet from a deer rifle might travel if there is no solid backstop?",o:["500-1000 metres","3500-5000 metres","5500-6000 metres","10,000 metres"],a:1},
+{q:"When crawling towards deer with a companion, what best describes the recommended condition for the rifles?",o:["Only the leader's rifle should be loaded and pointing forwards","Both rifles should be loaded in case other deer appear behind you","Neither rifle should be loaded until the firing position is reached","Only the second person should have a loaded rifle, the leader should be selecting the route"],a:2},
+{q:"Stalking in fog is:",o:["Easy because you can approach the deer unseen","Dangerous because you cannot be sure of a safe backdrop","Safer because walkers will not be on the hill","More exciting because you cannot be sure where the deer are"],a:1},
+{q:"Carrying a rifle with the firing pin resting on a chambered round is:",o:["Always dangerous and must never be done","Acceptable only in woodland stalking","Acceptable if the rifle is in its case","Acceptable if the safety catch is applied thus locking the bolt"],a:3},
+{q:"Before you climb into a high seat what should you do?",o:["Ensure that the rifle is loaded in case you see a deer as you climb the ladder","Cut some branches to improve your concealment as you climb","Check the ladder and seat for damage and unload your rifle before climbing into the seat","Rest the loaded rifle against the base of the seat and pull it up on a cord when you are safely seated"],a:2},
+{q:"In England and Wales what is the minimum muzzle energy required from a rifle to be legal for stalking all species of deer?",o:["1600 ft/lbs (2168 joules)","1700 ft/lbs (2305 joules)","1750 ft/lbs (2373 joules)","1800 ft/lbs (2439 joules)"],a:2},
+{q:"In England and Wales which of the following rifle and ammunition combinations is ILLEGAL for use to kill deer?",o:[".222 Remington 45gr hollow point bullet (ME: 1000 ft lbs/1356 joules)",".243 Winchester 100gr soft nose bullet (ME: 2090 ft lbs/2831 joules)","30-30 Winchester 170gr soft nose bullet (ME: 1765 ft lbs/2397 joules)","30-06 Springfield 180gr soft nose bullet (ME: 2914 ft lbs/3948 joules)"],a:0},
+{q:"In England and Wales it is illegal to shoot any deer at night unless injured. How is 'night' defined in law?",o:["When you cannot read a car number plate at 25 metres","Between one hour after sunset and one hour before sunrise","During official 'lighting up time' as published in the local newspapers","Between 2000 hours GMT and 0800 hours GMT"],a:1},
+{q:"Red stags are grazing on the edge of an airfield during the hours of darkness posing a threat to public safety. Who in England would issue a night shooting licence?",o:["Defra","Civil Aviation Authority","Natural England","The airport owners"],a:2},
+{q:"If you wish to net or trap deer in England, from whom is permission obtained?",o:["You can net or trap wild deer without permission","The owner of the land where the deer are to be trapped","The Forestry Commission","Through Natural England"],a:3},
+{q:"If you wish to net or trap deer in Wales, from whom is permission obtained?",o:["You can net or trap wild deer without permission","The owner of the land where the deer are to be trapped","The Forestry Commission","Natural Resources Wales"],a:3},
+{q:"What is the minimum legal calibre for a roe deer rifle in England and Wales?",o:[".222\"",".243\"",".240\"",".270\""],a:1},
+{q:"What is the minimum legal calibre for a muntjac and CWD deer rifle in England and Wales?",o:[".220\"",".243\"",".240\"",".270\""],a:0},
+{q:"In England, where would you go for the definitive up to date male Roe season?",o:["Natural Resources Wales","NatureScot","Natural England","Department of Agriculture, Environment and Rural Affairs"],a:2},
+{q:"In Wales, where would you go for the definitive up to date male Red season?",o:["Natural Resources Wales","Natural England","Department of Agriculture, Environment and Rural Affairs","NatureScot"],a:0},
+{q:"In Wales, where would you go for the definitive up to date male Fallow season?",o:["Natural England","Natural Resources Wales","NatureScot","Department of Agriculture, Environment and Rural Affairs"],a:1},
+{q:"In England, where would you go for the definitive up to date male Sika season?",o:["Natural Resources Wales","Department of Agriculture, Environment and Rural Affairs","NatureScot","Natural England"],a:3},
+{q:"In Wales, where would you go for the definitive up to date Red hind season?",o:["Natural Resources Wales","Natural England","Department of Agriculture, Environment and Rural Affairs","NatureScot"],a:0},
+{q:"In England, where would you go for the definitive up to date Sika hind season?",o:["Natural Resources Wales","NatureScot","Natural England","Department of Agriculture, Environment and Rural Affairs"],a:2},
+{q:"In Wales, where would you go for the definitive up to date Fallow doe season?",o:["Natural England","Natural Resources Wales","NatureScot","Department of Agriculture, Environment and Rural Affairs"],a:1},
+{q:"In England, where would you go for the definitive up to date Roe doe season?",o:["Natural England","Department of Agriculture, Environment and Rural Affairs","NatureScot","Natural Resources Wales"],a:0},
+{q:"In England, where would you go for the definitive up to date Chinese Water Deer doe season?",o:["Natural England","Natural Resources Wales","Department of Agriculture, Environment and Rural Affairs","NatureScot"],a:0},
+{q:"In England and Wales, shotguns firing non-spherical projectiles weighing more than 350 grains or certain shot may be used to kill deer doing serious damage to crops. Which of the following may be used?",o:["A 20 bore shotgun or larger with AAA shot or legal slug","A 12 bore shotgun or larger with SSG shot only","A 12 bore shotgun or larger with AAA shot only or legal slug","A .410 bore but with slug only"],a:2},
+{q:"Under what circumstances is it legal for an occupier to shoot uninjured deer out of season in England?",o:["If you were unable to do so in the open season due to illness (certified by a doctor)","If deer of the same species are seriously damaging your agricultural crops and you cannot prevent further damage by other means, and you shoot them where the damage is occurring","If the gamekeeper would not let you do so in the open season due to risk of disturbing the pheasant shooting","If they are eating all the bluebells and other wild flowers"],a:1},
+{q:"In England what type of appropriate calibre rifle bullets may legally be used to kill deer?",o:["Any soft nosed or hollow nosed bullet","Any bullet weighing over 50 grains","Any bullet with a metal jacket totally covering the lead core","Only a bullet over 100 grains with a metal jacket totally covering the lead core"],a:0},
+{q:"Shooting deer from a vehicle in England and Wales is?",o:["Legal anywhere","Only legal from a stationary vehicle with the engine switched off","Legal at night without the occupier's written permission but with a DEFRA permit","Illegal in all circumstances"],a:3},
+{q:"Which of the following is illegal to use for shooting muntjac in England and Wales?",o:["A .222 and 50 grain soft nosed ammunition","Any rifle and bullet combination legal for other species of deer","A .22 LR with hollow-point bullets","A 5.56 mm using 50 grain soft-nosed or hollow-point bullets"],a:2},
+{q:"You stalk a roe doe and her buck kid during January in England. You intend to cull the doe - can you also cull the buck kid?",o:["No, roe bucks are out of season in January","No, unless you have a licence to shoot out of season","Yes, if the landowner tells you to","Yes - the law allows dependent young to be culled in such circumstances"],a:3},
+{q:"In Scotland, where would you go for the definitive up to date Red hind season?",o:["Natural England","Natural Resources Wales","NatureScot","Department of Agriculture, Environment and Rural Affairs"],a:2},
+{q:"In Scotland, where would you go for the definitive up to date Sika hind season?",o:["NatureScot","Natural Resources Wales","Natural England","Department of Agriculture, Environment and Rural Affairs"],a:0},
+{q:"In Scotland, where would you go for the definitive up to date Fallow doe season?",o:["Natural Resources Wales","NatureScot","Department of Agriculture, Environment and Rural Affairs","Natural England"],a:1},
+{q:"To sell venison legally in Scotland, a person who is not a licensed venison dealer:",o:["Can only sell to a licensed Venison dealer","Must own the land where it was shot and keep records","May sell it to a hotel, restaurant or butcher's shop even without a venison dealer's licence","May barter it for something else"],a:0},
+{q:"Which is the statutory body responsible for the conservation and control of deer in Scotland?",o:["The Forestry Commission","The British Deer Society","The Association of Deer Management Groups","NatureScot"],a:3},
+{q:"What is the minimum legal muzzle velocity allowed for a bullet to shoot deer in Scotland?",o:["1700 ft/sec","1750 ft/sec","1900 ft/sec","2450 ft/sec"],a:2},
+{q:"What is the minimum legal bullet weight for use on sika deer in Scotland?",o:["50 grains","75 grains","80 grains","100 grains"],a:2},
+{q:"What is the minimum legal muzzle energy of a bullet for use on red deer in Scotland?",o:["1000 ft/lbs","1700 ft/lbs","1750 ft/lbs","2450 ft/lbs"],a:3},
+{q:"Shooting any species of deer in Scotland is allowed on a Sunday:",o:["Under no circumstances","Only if the shooting would be legal on any other day of the week","Only if authorised by a Church Official","Only with permission from the Police"],a:1},
+{q:"Under what circumstances may a deer be killed in England, Scotland and Wales with a .22 rimfire without breaking the law?",o:["When it is marauding in a suburban garden","By a foreign visitor","At night using a spotlight","When injured to prevent further suffering"],a:3},
+{q:"If serious deer damage to crops or trees is being suffered by foresters or tenant farmers on fenced land in Scotland, what are their legal options?",o:["They can shoot deer at night without permission","They can shoot deer at night with the landowner's written permission","They can apply to NatureScot for a night shooting permit","They can trap or snare the deer concerned because shooting at night is not allowed"],a:2},
+{q:"In Scotland the use of a Thermal Imaging or Image Intensifying sight at night is:",o:["Illegal under any circumstance","Has no restrictions","Legal with authorisation from NatureScot","Legal if you can't get out during daylight hours"],a:0},
+{q:"In Scotland a Thermal Imaging or Image Intensifying sight:",o:["Can only be used within the hours defined as daylight","Can be used at night with authorisation from NatureScot","Is illegal - only spotting scopes are allowed","Can be used at night with permission from the landowner"],a:0},
+{q:"Deer marauding into crops in Scotland may legally be:",o:["Snared","Shot using any firearm/ammunition legal for that species under normal circumstances","Shot using any shotgun and size of shot","Shot using a 12 bore loaded with a single spherical ball"],a:1},
+{q:"As a land owner or holder of the shooting rights, can you release big red stags on your land in Scotland to improve the wild stock?",o:["Anywhere in Scotland","Nowhere in Scotland","Anywhere except the Hebrides and some Western Isles","Anywhere with permission from NatureScot"],a:1},
+{q:"Who issues Firearms Certificates in Scotland?",o:["NatureScot","The Scottish Office","Police Scotland","The local District Council"],a:2},
+{q:"In England, Scotland and Wales if a deer has been injured on the road:",o:["It may be killed at night or out of season without permission by any means","Only a RSPCA officer may kill it out of season","The police must be called to authorise its humane dispatch at night","Only the landowner may kill it"],a:0},
+{q:"You are visiting an estate in Scotland to stalk stags in August. The stalker tells you to shoot a red hind (out of season) because it is marauding on turnips:",o:["You may do so only if it is actually in the turnip field","You may only do so if you are specifically named on a NatureScot authorisation","You may only do so if you have actually seen the damage yourself and judge it to be serious","It would be legal for a paying guest to do so under the stalker's guidance"],a:1},
+{q:"What is the minimum bullet weight which may be legally used to shoot roe deer only in Scotland?",o:["50 grains","55 grains","90 grains","100 grains"],a:1},
+{q:"What is the minimum legal muzzle energy allowed for a bullet to shoot roe deer only in Scotland?",o:["950 ft/lbs","1000 ft/lbs","1500 ft/lbs","1750 ft/lbs"],a:1},
+{q:"Your deer rifle needs adjusting by a gunsmith but you are busy. What are your legal options?",o:["You can tell your partner to take it in as long as he/she is over 17 and takes your Firearm Certificate with them","You can send it by normal parcel post","You can send it by a firearms registered carrier","You can tell anyone over 21 to take it in as long as they have your FAC with them and your instructions in writing"],a:2},
+{q:"Why have muntjac no legal Close Season in Britain?",o:["They have the status of pests and must be shot on sight","They breed all the year round and therefore a Close Season will not protect new-born fawns","You cannot tell the sexes apart so could not obey a Close Season","The fawns are self sufficient from birth therefore do not need parental support"],a:1},
+{q:"Under what circumstances can you have a rifle and ammunition for it in your car on the public road?",o:["At any time in case you find a deer injured by a traffic accident","If you can prove you have lawful authority and reasonable excuse","If you are visiting a farm where you hope to get permission to stalk","If you have the bolt removed from the rifle"],a:1},
+{q:"What is the legal position in regard to shooting deer with a bow and specially designed hunting arrows?",o:["It is not legal anywhere in UK","It is only legal in an enclosed deer park","It is legal in Scotland but not England or Wales","It is legal for foreigners with a permit from the Tourist Board"],a:0},
+{q:"Who owns wild deer while they are alive?",o:["The owner of the land on which they are found","The Government","The holder of the deer stalking rights over the land on which they are found","No one"],a:3},
+{q:"From where would you obtain written permission to shoot deer on land which does not belong to you?",o:["The Police","DEFRA","Holder of the deer stalking rights","The Local County Council"],a:2},
+{q:"If you are unable to produce your Firearm Certificate when a Police Officer asks you for it:",o:["He/she may legally seize and hold your firearms until you produce it","He/she may require that you produce your certificate at a police station within 24 hours","You are liable to prosecution for failure to carry a valid certificate with you","He/she must accept a photocopy of your certificate instead"],a:1},
+{q:"In the UK where may you release sika into the wild?",o:["Anywhere with the landowner's permission","Anywhere except England and Wales","Not at all","Under licence, but excluding the Western Isles"],a:2},
+{q:"Which of the following types of full bore rifle is illegal in the United Kingdom?",o:["Lever action rifle","Single shot rifle","Bolt action rifle","Semi-automatic rifle"],a:3},
+{q:"Your stalking partner has asked you to store his rifle in your gun cabinet whilst he is on holiday. What is the legal position?",o:["You may do so for up to three weeks","You may do so only if you inform the police by registered letter within seven days","You may not do so unless he removes the bolt so that you cannot use the rifle illegally","You may do so only if your FAC has his rifle entered on it"],a:3},
+{q:"Your 14-year-old son wants to go deer stalking but has no Firearm Certificate. What are your legal options? (not used in Northern Ireland)",o:["He can use your rifle, once he has first obtained a Firearms Certificate for that rifle","You can lend him your rifle without a Certificate as long as you supervise him closely","You can allow him to buy a rifle himself having first obtained a Firearms Certificate","You send him out under supervision of a local gamekeeper whose estate rifle he will borrow"],a:3},
+{q:"The holder of a Firearm Certificate may legally purchase a rifle or ammunition when they are:",o:["14","16","17","18"],a:2},
+{q:"A heart shot deer runs 80 metres before falling dead in a neighbour's field. What are your legal options?",o:["You can retrieve it without asking permission","You can retrieve it without asking permission, but only if you leave your rifle on your side of the boundary","You can retrieve it only with permission from the neighbour","You can retrieve it only if you can prove that it was shot on your side of the boundary if anyone stops you"],a:2},
+{q:"An injured muntjac deer taken into an animal sanctuary has now fully recovered. It:",o:["May be released but only after it has been certified fit and healthy by a vet","May never be released back into the wild","May be released with permission from the County Council","May be released but only within 2 km of where it was taken"],a:1},
+{q:"You have bought a farm in North Wales with no deer and would like to investigate a release programme. Which of the following best describes the option open to you?",o:["You may release any species of deer there without permission","You may not release any deer there without permission","You may only release red, roe or fallow deer without a licence","You can get permission from DEFRA to release any deer there"],a:1},
+{q:"What is the minimum bullet weight which may be legally used to take deer in Northern Ireland?",o:["50 grains","80 grains","100 grains","130 grains"],a:2},
+{q:"Within Northern Ireland (NI) what is the primary legislation giving protection to deer?",o:["The Firearms (NI) Order 2004 and subsequent amendments","The Wildlife (NI) Order 1985 and subsequent amendments","The Deer Act 1991","The Wildlife and Countryside Act 1981 and subsequent amendments"],a:1},
+{q:"What is the minimum bullet diameter legally required to take deer in Northern Ireland?",o:["0.236\"","0.240\"","0.243\"","0.270\""],a:2},
+{q:"In Northern Ireland, where would you go for the definitive up to date Red hind season?",o:["Natural Resources Wales","Department of Agriculture, Environment and Rural Affairs","NatureScot","Natural England"],a:1},
+{q:"In Northern Ireland, where would you go for the definitive up to date fallow buck season?",o:["Natural England","Department of Agriculture, Environment and Rural Affairs","Natural Resources Wales","NatureScot"],a:1},
+{q:"In Northern Ireland, where would you go for the definitive up to date sika stags season?",o:["NatureScot","Natural England","Department of Agriculture, Environment and Rural Affairs","Natural Resources Wales"],a:2},
+{q:"In Northern Ireland, shotguns firing a single non-spherical projectile weighing more than 350 grains or AAA shot may be used to kill deer doing serious damage to crops. Which gauge of shotgun may be used?",o:["A 20 bore shotgun or larger","A 16 bore shotgun or larger","A 12 bore shotgun or larger","A 410 bore may be used but with slug only"],a:2},
+{q:"In Northern Ireland, you may lend your rifle to a non-firearm certificate holder providing:",o:["They must be over 14 years of age and resident on the land in question","They must be over 16 years of age and the usage is for sporting purposes","They must be over 18 years, not be a 'prohibited person' and must be in your presence when using the rifle","They can be of any age but must be resident on the land over which you are planning to shoot"],a:2},
+{q:"In Northern Ireland it is illegal to shoot any deer at night unless injured. How is 'night' defined in law?",o:["When you cannot read a car number plate at 25 metres","Between one hour after sunset and one hour before sunrise","During official 'lighting up time' as published in the local newspapers","Between 2000 hours GMT and 0800 hours GMT"],a:1},
+{q:"Which type of rifle bullet must be used to cull deer in Northern Ireland?",o:["Soft point bullets of up to 90 grains","Hollow point bullets of over 120 grains with a muzzle energy of 1650 ft/lbs","An expanding bullet weighing not less than 100 grains designed to deform in a predictable manner upon entering tissue","Full metal jacket bullets designed to tumble on impact and thereby increase the knock down effect on striking a deer"],a:2},
+{q:"If a shot at a deer for no apparent reason misses or does not hit where expected, before shooting at another deer a responsible stalker should do what?",o:["Thump the rifle butt gently to settle the action back into its bedding","Give the rifle a thorough cleaning and oiling","Fire carefully at a target to check the rifle is still correctly zeroed","Try a different bullet weight to see if things improve"],a:2},
+{q:"If your rifle is zeroed 'spot on' at 100 yards, approximately where will your shots at 200 yards go?",o:["A few inches high","A few inches low","15 inches low","30 inches low"],a:1},
+{q:"When taking a shot in the field it is good practice and an aid to accuracy:",o:["To rest the barrel of your rifle on top of a hard surface for support","To push the barrel of your rifle up against a fence wire for support","To push the barrel of your rifle sideways against a tree for support","To place the hand holding the fore-stock between a firm surface and the stock for support"],a:3},
+{q:"Before zeroing your rifle what should you do?",o:["Clean the bore and check the bedding and mounting screws are tight","Alter trigger pressure to maximum","Oil the bore and ammunition lightly and release the bedding screws half a turn","Alter the trigger pressure to minimum"],a:0},
+{q:"If your rifle is shooting 3 inches left when you sight in at 25 yards, at 100 yards where will it shoot?",o:["3 inches left","6 inches left","9 inches left","12 inches left"],a:3},
+{q:"If firing at a deer 100 yards away with a strong 30 mph wind blowing from left to right and you have to take the shot, where should you aim?",o:["3 inches right","3 inches left","At the usual place","In the centre of the body to ensure a hit"],a:1},
+{q:"Continental or metric rifle calibres are often described with two numbers e.g. 6.5 x 57. What does the second figure refer to?",o:["The amount of powder in grains","The bullet weight in grains","The case length in millimetres","Barrel length in centimetres"],a:2},
+{q:"If one click of a telescopic sight adjustment knob moves bullet impact 1 cm at 100 metres, how far will it move per click at 25 metres?",o:["1/4 centimetre","1 centimetre","2 centimetres","8 centimetres"],a:0},
+{q:"Define what zeroing a rifle and telescopic sight involves:",o:["Adjusting your sight so that your aim coincides with your group at a chosen range","Moving the sight adjustment knobs to zero before firing a test group","Aligning the bore with a collimator","Ensuring the rifle shoots small groups"],a:0},
+{q:"If you leave oil in your barrel what is likely to happen to your first shot at 100 metres?",o:["It will go to the point where the rifle is normally zeroed","It will go exactly where you aim","It will go somewhere other than where the rifle is normally zeroed","It will decrease wear and tear on the barrel"],a:2},
+{q:"What is the spin imparted to a bullet by the rifling intended to do?",o:["Increase its velocity","Improve its stability in flight","Help its penetration on the target","Increase the muzzle energy"],a:1},
+{q:"What is the definition of the term 'headspace'?",o:["The distance between your head and the telescopic sight, when the reticule is in focus","The distance between the closed bolt face and a datum point on the chambered cartridge case","The size of a deer's head in relation to the reticule","The distance between the firing pin and the primer when the rifle is cocked"],a:1},
+{q:"Describe what a bullet's trajectory is:",o:["The height of the bullet above the line of sight at half the zeroed range","The height of the bullet above the line of sight at twice the zeroed range","The path of the bullet in flight","The drop below the line of sight after zero range has been reached"],a:2},
+{q:"You are offered some ammunition hand loaded by a stalker which he finds performs well in his rifle. What should you do?",o:["Test the ammunition when you next go to the range","Politely refuse the offer","Disassemble the round to check the components","Place an order for another 100 rounds"],a:1},
+{q:"How might an ineffective obturation seal between cartridge case and chamber be indicated?",o:["A misfire","Black streaks from the neck down the outside of the case","Flattened primer","Excessive flash from muzzle"],a:1},
+{q:"Following the roe rut, when would you normally expect to see at least one foetus in the womb of a pregnant doe?",o:["Mid September-October","Mid October-November","Mid November-December","Mid December-January"],a:2},
+{q:"When is a roe buck's testosterone levels highest?",o:["January","May","July","October"],a:2},
+{q:"Scrapes below a fraying stock are associated with the territorial marking behaviour by the male of which deer species?",o:["Fallow deer","Sika deer","Roe deer","Red deer"],a:2},
+{q:"When do mature roe bucks usually start to clean the velvet from their antlers?",o:["By the end of December","By the end of January","By the end of March","By the end of May"],a:2},
+{q:"Which of the following deer species has no visible tail?",o:["Red deer","Roe deer","Muntjac deer","Fallow deer"],a:1},
+{q:"What are the rough knobbles running up the majority of mature roe buck antlers called?",o:["Coronets","Pearling","Pedicles","Beams"],a:1},
+{q:"Which of the following female deer species frequently has twins?",o:["Red deer","Fallow deer","Roe deer","Muntjac deer"],a:2},
+{q:"Delayed implantation of the fertilised egg is associated with which deer species?",o:["Muntjac deer","Chinese water deer","Roe deer","Sika deer"],a:2},
+{q:"At what time of the year do most roe bucks cast their antlers?",o:["April/May","September/October","November/December","February/March"],a:3},
+{q:"In which month are most roe kids born?",o:["March/April","April/May","May/June","June/July"],a:2},
+{q:"Roe bucks and does tend to defend a territory throughout the summer months. Under normal circumstances which is most likely?",o:["For a buck's territory to overlap with that of another buck","For a buck's territory to be the same size and shape throughout its life","For a buck to hold a territory trying to exclude all other mature bucks","For a doe to hold an exclusive territory trying to exclude all other does including the kids of that year"],a:2},
+{q:"In what month does the roe rut usually begin?",o:["July","August","September","October"],a:0},
+{q:"In winter you see a roe deer without antlers but showing a downward projecting tuft of hair below the rump patch (caudal disc). What does this indicate?",o:["A buck who has shed or not yet grown antlers","A hummel roe buck","A buck kid which has not yet become fertile","A doe"],a:3},
+{q:"What are the best weather conditions for calling roe bucks during the rut?",o:["Humid and still","Cool and breezy","Heavy rain and wind","Foggy"],a:0},
+{q:"The white throat markings found on some roe deer are called:",o:["Blazers","Collars","Gorget patches","Throat glands"],a:2},
+{q:"What is the normal reaction if a roe is frightened and runs off?",o:["It usually sticks its tail straight up in the air","Its white rump patch is usually fluffed out","It whistles as a warning to other deer","It hides its white rump patch to confuse predators"],a:1},
+{q:"In the summer, you see a small deer without antlers look at you over a bush. It has pointed ears rimmed in black and a muzzle with white patches on its chin and upper lips. What is it?",o:["A muntjac doe","A chinese water deer","A fallow doe","A roe doe"],a:0},
+{q:"Which of the following best describes the behaviour of newly born roe deer kids?",o:["They follow the doe closely as soon as they are born","They are closely guarded by the buck while the doe feeds","They run away swiftly if discovered the first week after birth","They are left hidden between feeds by their mother until strong enough to follow her"],a:3},
+{q:"How is roe deer rutting activity frequently initiated?",o:["By the doe enticing the buck to follow her until mating can take place","By the buck herd moving into the doe's feeding ground","By bucks and their rutting stands barking at the does","By does coming into season within days of giving birth"],a:0},
+{q:"During which month would you observe your roe deer to determine the previous year's recruitment to the population?",o:["October","March","June","August"],a:1},
+{q:"In summer you see saplings frayed at 30-70 cm above ground level and an associated triangular scrape. This is most likely to have been done by male deer of which species?",o:["Red","Fallow","Chinese water","Roe"],a:3},
+{q:"What is the minimum recommended height of tree shelter to be used in new plantations where roe deer are the only species present?",o:["0.4 metre","1.5 metres","0.9 metres","1.2 metres"],a:1},
+{q:"A male roe buck kid which develops and casts very small knob antlers in its first winter is called:",o:["A spiker","A button-buck","A royal","A staggie"],a:1},
+{q:"In late winter, roe deer:",o:["Are seen in larger mixed sex groups","Remain as solitary individuals","Form all male groups","Form all female groups"],a:0},
+{q:"When do most roe does eject their last season's kids?",o:["January","February","April","July"],a:2},
+{q:"How many points does EACH antler of a typical mature roe buck have?",o:["1 point","3 points","6 points","12 points"],a:1},
+{q:"Between March and August, mature roe bucks are generally:",o:["Territorial","Herding","Wide-ranging","Nomadic"],a:0},
+{q:"How is the feeding pattern of roe deer generally described?",o:["Bulk","Omnivorous","Grazing","Selective"],a:3},
+{q:"Which of the following mature female deer is territorial during the summer months?",o:["Sika","Roe","Red","Fallow"],a:1},
+{q:"The natural life-span of a roe deer is usually no longer than:",o:["10 years","15 years","4 years","5 years"],a:1},
+{q:"'Pronking' is a gait usually associated with which species of deer?",o:["Roe","Fallow","Red","Chinese water deer"],a:1},
+{q:"The female deer of which species is correctly called a doe as opposed to a hind or cow?",o:["Red deer","Fallow deer","Sika deer","Reindeer"],a:1},
+{q:"A pronounced hanging 'tassel' and 'Adam's apple' are associated with the males of which deer species?",o:["Red deer","Sika deer","Fallow deer","Roe deer"],a:2},
+{q:"Mature fallow bucks usually carry antlers which are:",o:["Narrow and eight pointed","Wide and flattened or palmated","Wide, round and multi pointed","Short stubby and six pointed"],a:1},
+{q:"How would you describe the rump markings of a 'common' variety of fallow deer?",o:["A white disc with black horseshoe-shaped mark round the upper side and a broad black stripe on the tail","A white disc with pale brown horseshoe-shaped mark round the upper side and a white tail","A pale ginger rump with no markings","A pale yellow rump which stretches well up the back"],a:0},
+{q:"What does the call of a rutting fallow buck on his stand sound like?",o:["A sharp single bark that is not repeated","A terrier-like bark repeated continuously","A whistle rising and falling in pitch","A rhythmic belching noise repeated continuously for some minutes"],a:3},
+{q:"The male of which deer species usually holds a rutting 'stand'?",o:["Red deer","Chinese water deer","Muntjac deer","Fallow deer"],a:3},
+{q:"When are the majority of fallow fawns born?",o:["April","May","June","August"],a:2},
+{q:"When is the peak of the fallow rut?",o:["May","July/August","October/November","December"],a:2},
+{q:"The adult coat of which of the following species usually displays many white spots in the summer?",o:["Roe deer","Fallow deer","Muntjac deer","Red deer"],a:1},
+{q:"In the spring fallow deer are usually found:",o:["In groups comprising a mix of all age groups and both sexes","In groups containing either young or old animals but seldom both","In groups with the does and fawns living separately from the older bucks","As single animals or a doe and fawn but seldom in groups"],a:1},
+{q:"In what month do the majority of fallow bucks usually start to shed their velvet?",o:["July","August","September","October"],a:1},
+{q:"What is the correct name for black coloured fallow deer?",o:["Menil","Common","Melanistic","Blue coats"],a:2},
+{q:"What colour are the caudal markings and back stripe on menil fallow?",o:["Black","Dark grey","Light brown","Pink"],a:2},
+{q:"Compared to sika deer, fallow deer have:",o:["A longer tail","A shorter tail","A similar length of tail","No tail at all"],a:0},
+{q:"The top points along the palm of a fallow buck's antlers are called:",o:["Spellers","Tops","Pearls","Offers"],a:0},
+{q:"For the rut the neck of a fallow buck looks much thicker because:",o:["A mane has grown","Neck muscles have enlarged","Fat has been deposited under the skin","The skin has become very much thicker"],a:0},
+{q:"With which other species will fallow deer hybridise?",o:["Red","Sika","Roe","None of the above"],a:3},
+{q:"Which of these species seldom has upper canine teeth when mature?",o:["Red","Muntjac","Fallow","Sika"],a:2},
+{q:"The complete permanent dentition of a fallow deer consists of how many teeth?",o:["30","32","36","38"],a:1},
+{q:"Which of these deer form large social groups?",o:["Muntjac","Roe","Chinese water","Fallow"],a:3},
+{q:"Male fallow deer have usually left their mother's social group by the age of:",o:["9 months","12 months","18 months","2 years"],a:2},
+{q:"During the rut fallow bucks:",o:["Gorge themselves to put on weight","Spend more time than usual lying around in all male groups","Feed much less than usual","Develop thin scrawny necks"],a:2},
+{q:"By what age do fallow deer generally attain a full set of erupted permanent teeth?",o:["11-13 months","16-19 months","24-30 months","34-38 months"],a:2},
+{q:"A fallow buck is killed in autumn. The end of the penis sheath is black/brown and looks like dry cracked earth. What is this a sign of?",o:["Venereal disease","Normal rutting condition","Congenital abnormality","Infection after damaging the skin"],a:1},
+{q:"Which of the following species of deer is considered native to the British Isles (resident since the Ice Age)?",o:["Red","Sika","Fallow","Reindeer"],a:0},
+{q:"The male of which of the following species 'roars' during the rut?",o:["Roe deer","Red deer","Fallow deer","Sika deer"],a:1},
+{q:"What type of antler growth does a red deer 'hummel' have?",o:["Only one antler","No antlers","Two antlers without any points above the brow tines","Spikes covered in sponge velvet"],a:1},
+{q:"A yeld red hind is one which has:",o:["Twin calves at heel that year","One calf that year and a follower from the year before at heel","No calf being suckled that year","One calf being suckled that year"],a:2},
+{q:"To what is the term 'knobber' in red deer attributed?",o:["A mature stag which never grows antlers","A young stag growing his first antlers","An old stag who has shed his antlers early","A stag which cannot shed the velvet off his antlers"],a:1},
+{q:"Mature highland red stags and hinds:",o:["Form separate single sex herds except during the rut","Occupy the same core area and remain in mixed herds all the year","Can be found in mixed herds but only on the best feeding areas in the summer","Pair for life and are usually found together"],a:0},
+{q:"The male of which of the following species grows a mane in the rut?",o:["Red deer","Roe deer","Fallow deer","Muntjac deer"],a:0},
+{q:"The majority of highland red deer when resting:",o:["Usually lie down watching uphill","Usually lie down watching downhill","Don't appear to favour any direction","Turn round constantly to keep a look-out in all directions"],a:0},
+{q:"When feeding on the open hill red deer:",o:["Generally keep their backs to the wind","Keep their heads into the wind","Often do so lying down to stay out of the wind","Have no special feeding pattern"],a:1},
+{q:"What is the feeding pattern of mature red stags during the peak of the rut?",o:["They feed heavily all the time to keep up their strength","They feed at night when rutting activity stops","They feed very little and lose weight","They feed by day but are guarding their hinds at night"],a:2},
+{q:"When do the majority of red stags normally cast their antlers?",o:["December-February","March-May","May-July","September-November"],a:1},
+{q:"In what month is the usual peak of the red deer rut?",o:["August","October","November","December"],a:1},
+{q:"How would you best describe the rump patch of red deer in winter coat?",o:["It is yellowish and runs up onto the back above the tail","It is more prominently white than roe or sika","It is surrounded by a prominent black border","It has a black stripe down the tail"],a:0},
+{q:"In daytime during July/August in Scotland, highland red stags are usually found:",o:["In stag herds on the low grounds where there is good feeding","In stag herds on the high ground","In mixed herds with the hinds","Alone on the river flats feeding to put on fat"],a:1},
+{q:"What is the general movement pattern of open hill red deer?",o:["They move to higher ground during the hours of darkness","They move to lower ground during the hours of darkness","They change their range very little day or night","They never move at night"],a:1},
+{q:"Which of the following statements best describes the damage inflicted on trees by red deer?",o:["Red deer eat tree bark by stripping it off using their lower incisors","Red deer cannot eat bark because they have no upper incisors","Red deer never damage tree bark, they only eat shoots","Red deer only damage bark by thrashing with antlers"],a:0},
+{q:"When are most highland red deer calves born?",o:["April","June","July","August"],a:1},
+{q:"How many offspring will wild red deer hinds produce?",o:["They will often bear twin calves","They will usually bear twin calves","They will very rarely bear twin calves","They will never bear twin calves"],a:2},
+{q:"At what distance can red deer detect human wind-borne scent?",o:["No more than 100 yards","No more than 500 yards","No more than 800 yards","Over a mile under certain conditions"],a:3},
+{q:"Wallowing by red deer:",o:["Is done by both stags and hinds","Is done only by stags","Is done only by hinds","Is only rarely done and never in daylight"],a:0},
+{q:"In red deer, a 'Royal' head is:",o:["14 points with 4 in a 'crown' on each top","12 points with 3 in a 'crown' on each top","10 points with a good fork on each top","20 points with 10 on each antler"],a:1},
+{q:"After having bred once, a highland red hind is likely to:",o:["Bear a calf every year without fail","Occasionally miss a year and not bear a calf","Bear a calf at any time of the year","Bear a calf only if there are plenty of stags around"],a:1},
+{q:"During the red deer rut, the most hinds are likely to be held by:",o:["The lighter faster stags","The young energetic stags","The stags with the most points on their antlers","The heaviest stags with the best body condition"],a:3},
+{q:"What is indicated by a red deer which watches intently and stamps its foot?",o:["It is trying to dominate a younger animal close by","It is suspicious at something seen, but not identified","It is stirring up the peat prior to wallowing","It is trying to shake off ticks"],a:1},
+{q:"When do red stags usually stand on their hind legs and box with their forefeet?",o:["At the height of the rut","After they have cast their antlers","When at a winter feed site","When dominating a hind"],a:1},
+{q:"If a red deer calf is orphaned early in the open hind season, might it:",o:["Survive well because it is independent of its dam","Pine away for lack of parental attention","Be adopted and fed by another hind","Be taken by a mature stag to join the stag herd"],a:1},
+{q:"What best describes a red hind's alarm call?",o:["A deep bark","A loud sharp squeal","A short whistle","A low whicker"],a:0},
+{q:"How is a newly-born red deer calf coloured?",o:["Pale ginger all over","Covered in black woolly fur","Chestnut coloured with dappled white spots","Just like a miniature adult in colour"],a:2},
+{q:"Which of the following best describes the behaviour pattern within a red deer hind herd?",o:["There is a definite pecking order of dominance","All animals are equal and share feeding","The lightest and quickest animals are dominant","Calves are always allowed to take precedence"],a:0},
+{q:"In order to contain or exclude red deer an effective fence should be:",o:["1 metre high","1.3 metres high","1.7 metres high","2 metres high"],a:3},
+{q:"To which species are sika deer most closely related?",o:["Red deer","Roe deer","Fallow deer","Muntjac deer"],a:0},
+{q:"Which colour configuration do Japanese sika hinds appear to have in winter coat?",o:["A golden brown colour all over","A two-tone colouring - chestnut brown on top, mushroom grey below","A fresh red and white dappled coat","A drab sooty grey colour all over with paler underbelly"],a:1},
+{q:"Sika hinds usually:",o:["Give birth to a single calf","Give birth to twins","Do not breed till they are three years old","Have multiple births"],a:0},
+{q:"What colour is the velvet covering the antlers of Japanese sika stags?",o:["Dark red","Pale brown","Black","Russet"],a:2},
+{q:"The metatarsal gland on the outer side of the hock of a mature Japanese sika deer is:",o:["Conspicuous, 2 inch long and white or pale grey in colour","Darker than the rest of the hock","Very hairy and gummed up with secretions","Not easy to see at all"],a:0},
+{q:"When are most sika calves born?",o:["April","June","August","October"],a:1},
+{q:"Which species are sika deer closest in size to?",o:["Red deer","Fallow deer","Roe deer","Muntjac deer"],a:1},
+{q:"How many points on their antlers do mature Japanese sika stags normally have?",o:["2 point heads","4 point heads","8 point heads","12 plus point heads"],a:2},
+{q:"What is the colour of Japanese sika deer's summer coat?",o:["Black and brown with faint spots","Nondescript grey and pale belly","Chestnut with white spots and pale belly","Foxy red all over"],a:2},
+{q:"Which deer gives a repeated rising and falling whistle in the rut?",o:["Muntjac deer","Roe deer","Sika deer","Red deer"],a:2},
+{q:"A deer which has a pronounced 'U' or 'V' shaped pale line across its brows and frowns when it looks at you is likely to be:",o:["A chinese water deer","A fallow deer","A red deer","A sika deer"],a:3},
+{q:"When do most mature sika stags cast their antlers?",o:["January","March","May","June"],a:2},
+{q:"How is a sika stag's rutting activity in woodland best described?",o:["Herding hinds into a harem","Using a rutting stand to attract hinds","Defence of a territory","A mixture of all three strategies"],a:3},
+{q:"How is sika deer feeding behaviour best described?",o:["Mainly browsing","Only grazing","A mixture of browsing and grazing","Subsisting on tree bark"],a:2},
+{q:"The word 'hind' is correctly applied to the female of which of the following deer species?",o:["Roe deer","Sika deer","Fallow deer","Muntjac"],a:1},
+{q:"Which of the following species most obviously flares out the hair on its rump patch when alarmed?",o:["Fallow deer","Sika deer","Chinese water deer","Red deer"],a:1},
+{q:"Which of the following deer wallow most readily?",o:["Roe deer","Muntjac deer","Sika deer","Chinese water deer"],a:2},
+{q:"What is included in a territorial display typical of a sika stag in woodland?",o:["Roaming continuously during daylight hours","Leaving piles of droppings on the rides surrounding their territories","Scoring the bark of trees deeply with their antler points","Chewing up fir cones and regurgitating the product at their territory boundaries"],a:2},
+{q:"How do sika stags mark out territories in the rut?",o:["With wallows","With scrapes in which they often urinate","By bole scoring trees","All of the above"],a:3},
+{q:"On which coat do wild sika deer have readily visible white spots?",o:["Winter coat only","Summer coat only","Neither coat","Both coats"],a:1},
+{q:"A sika/red hybrid often shows traits of both species. Which characteristic on an adult red deer might suggest it is a sika/red hybrid?",o:["A yellowish rump patch","A broad muzzle","Long narrow hairy ears","Prominent white (metatarsal) glands on outside of hocks"],a:3},
+{q:"Which male deer sometimes shed 'milky tears' during the rut?",o:["Roe deer","Fallow deer","Red deer","Sika deer"],a:3},
+{q:"How would you describe a sika hind's alarm call?",o:["A deep resounding bark","A single loud bark","A long wailing whistle","A short sharp squeak"],a:2},
+{q:"A mature sika stag typically:",o:["Lives a solitary life all year except during the rut","Lives in a stag herd except during the rut","Lives in a mixed age and sex group all year round","Lives in a tight family group with a hind and her round"],a:0},
+{q:"Tree bole scoring with antler points is predominantly done by which of the following species?",o:["Muntjac","Roe","Sika","Fallow"],a:2},
+{q:"From approximately what age are muntjac does able to conceive?",o:["14 months","18 months","12 months","7 months"],a:3},
+{q:"In what respect are adult muntjac bucks different from the males of native deer species?",o:["They have tusks that are visible externally","They do not have antlers","They have no visible tail","Their ears are round and hairy"],a:0},
+{q:"Which species of deer does not have a raised patch of hairs on the hocks?",o:["Sika","Fallow","Roe","Muntjac"],a:1},
+{q:"Which species of deer has scent glands at all of these sites: frontal, sub orbital, interdigital and in the reproductive tract?",o:["Fallow","Muntjac","Chinese water deer","Roe"],a:1},
+{q:"A mature muntjac buck's home range:",o:["Is a myth - muntjac are not territorial","Usually includes the home ranges of several females","Changes radically with the seasons","Is shared with a number of other mature bucks"],a:1},
+{q:"Which of these foods is least preferred by muntjac?",o:["Buds and leaves of deciduous shrubs","Flowers","Conifer leaves","Fungi"],a:2},
+{q:"By what age have muntjac fawns virtually lost their spots?",o:["One month","Two months","Three months","Four months"],a:1},
+{q:"What is the typical live body weight for an adult female muntjac?",o:["8 kg","12 kg","16 kg","18 kg"],a:2},
+{q:"When do most mature muntjac bucks cast their antlers?",o:["December/January","February/March","April/May","August/September"],a:2},
+{q:"A muntjac buck's first antlers:",o:["Always have small coronets and brow tines","Are usually simple thin spikes with no coronets or brow tines","Are always long thick spikes with no brow tines","Are cast on a date depending on the animal's date of birth"],a:1},
+{q:"Muntjac are:",o:["Seldom seen alone","Usually seen in ones and twos","Usually seen in small herds","Usually seen in large herds"],a:1},
+{q:"Which of these male deer might be seen mating when they have just cast their antlers?",o:["Roe","Sika","Muntjac","Fallow"],a:2},
+{q:"How often can muntjac females bear a fawn?",o:["Once a year in February","Twice a year in June and December","Every three months","Every seven months"],a:3},
+{q:"What noise do mature muntjac make when suspicious or disturbed?",o:["A shrill sharp squeak","A high pitched repetitive bark","A single deep bark","A triple toned whistle"],a:1},
+{q:"What is the typical antler configuration for the adult male muntjac?",o:["No antlers","Long palmated antlers","Short hooked antlers","6 point stubby antlers"],a:2},
+{q:"What is the normal period between the birth of a muntjac fawn and the end of lactation?",o:["About 2 months","About 6 months","About 7 months","About 9 months"],a:1},
+{q:"A small deer runs away from you in thick cover with its tail straight up in the air, the underside pure white. Which species is it likely to be?",o:["Muntjac deer","Roe deer","Chinese water deer","Red deer"],a:1},
+{q:"Why is a heavily pregnant female muntjac an ideal class to cull?",o:["Because they will not have a dependant fawn","Because their venison is the most tender","Because they are less wary so easier to stalk","Because they spend more time in the open"],a:0},
+{q:"Which species of deer breed regularly throughout the year?",o:["Muntjac","Red","Sika","Chinese water deer"],a:0},
+{q:"How would you describe the colour of an adult muntjac in summer coat?",o:["It is heavily spotted all over","It has a row of spots either side of the spine","It has a dark grey coat with black markings","It is a chestnut colour brown with white under parts"],a:3},
+{q:"During which period are muntjac born?",o:["All through the year","December-March","April-May","The month of July"],a:0},
+{q:"During which period are muntjac bucks fertile?",o:["All through the year","June-August","December-March","October-November"],a:0},
+{q:"A muntjac seen in velvet in December is probably:",o:["Growing his first antlers","Very old","In poor health","A typical adult"],a:3},
+{q:"Which species of deer in the UK has black lines and bony ridges running from its eyes to its antler bases?",o:["Sika deer","Muntjac deer","Chinese water deer","Fallow deer"],a:1},
+{q:"During which period of the year are muntjac antlers normally cast?",o:["December/January","February/March","April/May","October/November"],a:0},
+{q:"Which of these species has the most limited distribution in Britain?",o:["Sika","Chinese water deer","Muntjac","Fallow"],a:1},
+{q:"Which species of deer are associated with reed-bed habitats?",o:["Sika","Fallow","Chinese water deer","Muntjac"],a:2},
+{q:"Which species of deer has hind legs that appear to be longer than their forelegs?",o:["Fallow deer","Roe deer","Chinese water deer","Sika deer"],a:2},
+{q:"Which species of male deer has prominent tusks and no antlers?",o:["Muntjac deer","Roe deer","Chinese water deer","Sika deer"],a:2},
+{q:"Which species of deer has scent glands in the groin (inguinal glands)?",o:["Fallow","Sika","Chinese water deer","Roe"],a:2},
+{q:"A deer is described to you as having black button eyes and nose with round ears, resembling a teddy bear. What species of deer is it likely to be?",o:["Chinese water deer","Roe deer","Muntjac deer","Fallow deer"],a:0},
+{q:"During which month do Chinese water deer rut?",o:["July","September","October","December"],a:3},
+{q:"Chinese water deer usually give birth during the period of:",o:["March/April","May/June","August/September","All year round"],a:1},
+{q:"Which species of deer often produce 'multiple births' of three or more fawns?",o:["Roe deer","Chinese water deer","Muntjac deer","Sika deer"],a:1},
+{q:"Chinese water deer does may have their first fawns at the age of:",o:["Six months","One year old","Two years old","Three years old"],a:1}
+];
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+const SK={history:'dsc1_hist',weights:'dsc1_wts',session:'dsc1_sess'};
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function rm(k){try{localStorage.removeItem(k);}catch(e){}}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const QN=40;
+let quizQs=[],current=0,answers=[],isWeighted=false;
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+/* ============================================================
+   SCREEN NAV
+   ============================================================ */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showHome(){renderHome();show('home');}
+function showHistory(){renderHistory();show('history');}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome(){
+  const hist=ld(SK.history)||[];
+  document.getElementById('sAttempts').textContent=hist.length;
+  if(hist.length){
+    const pcts=hist.map(h=>h.pct);
+    document.getElementById('sBest').textContent=Math.max(...pcts)+'%';
+    document.getElementById('sAvg').textContent=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%';
+  }else{document.getElementById('sBest').textContent='--';document.getElementById('sAvg').textContent='--';}
+  // Recent
+  const recent=[...hist].reverse().slice(0,3);
+  let rh=recent.length?'<div class="recent-hd">Recent attempts</div>':'';
+  recent.forEach(r=>{
+    const cls=r.pct>=75?'pass':'fail';
+    rh+=`<div class="recent-row"><span class="recent-date">${r.date}${r.weighted?' &middot; W':''}</span><span class="recent-score ${cls}">${r.pct}% (${r.correct}/${r.total})</span></div>`;
+  });
+  document.getElementById('recentList').innerHTML=rh;
+  // Resume banner
+  const sess=ld(SK.session);
+  const rb=document.getElementById('resumeBanner');
+  if(sess){
+    const done=sess.answers.filter(a=>a!==-1).length;
+    rb.innerHTML=`<div class="resume-banner"><div class="resume-info"><strong>Quiz in progress</strong>Q${sess.current+1} of ${QN} &middot; ${done} answered</div><div class="resume-btns"><button class="btn-sm green" onclick="resumeSaved()">Resume</button><button class="btn-sm ghost" onclick="discardSession()">Discard</button></div></div>`;
+  }else{rb.innerHTML='';}
+}
+
+/* ============================================================
+   WEIGHTED POOL
+   ============================================================ */
+function buildPool(){
+  if(!isWeighted) return shuffle(QB.map((_,i)=>i)).slice(0,QN);
+  const w=ld(SK.weights)||{};
+  const pool=[];
+  QB.forEach((_,i)=>{const t=1+(w[i]||0);for(let j=0;j<t;j++)pool.push(i);});
+  shuffle(pool);
+  const seen=new Set(),picked=[];
+  for(const idx of pool){if(!seen.has(idx)){seen.add(idx);picked.push(idx);}if(picked.length===QN)break;}
+  if(picked.length<QN){const rest=shuffle(QB.map((_,i)=>i).filter(i=>!seen.has(i)));picked.push(...rest.slice(0,QN-picked.length));}
+  return picked;
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+function startQuiz(){
+  discardSession();
+  isWeighted=document.getElementById('weightedToggle').checked;
+  const indices=buildPool();
+  quizQs=indices.map(oi=>{
+    const q=QB[oi];
+    const indexed=q.o.map((text,i)=>({text,correct:i===q.a}));
+    const sh=shuffle(indexed);
+    return{origIdx:oi,q:q.q,opts:sh.map(x=>x.text),ans:sh.findIndex(x=>x.correct)};
+  });
+  current=0;answers=new Array(QN).fill(-1);
+  document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
+  show('quiz');renderQuestion();
+}
+
+/* ============================================================
+   PAUSE / RESUME
+   ============================================================ */
+function pauseQuiz(){
+  sv(SK.session,{quizQs,current,answers,isWeighted});
+  const done=answers.filter(a=>a!==-1).length;
+  document.getElementById('pausedInfo').textContent=`Q${current+1} of ${QN} \u00b7 ${done} answered. Your progress is saved.`;
+  show('paused');
+}
+function resumeSaved(){
+  const sess=ld(SK.session);
+  if(!sess){showHome();return;}
+  quizQs=sess.quizQs;current=sess.current;answers=sess.answers;isWeighted=sess.isWeighted||false;
+  document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
+  show('quiz');renderQuestion();
+}
+function abandonQuiz(){discardSession();showHome();}
+function discardSession(){rm(SK.session);}
+
+/* ============================================================
+   RENDER QUESTION
+   ============================================================ */
+function renderQuestion(){
+  const q=quizQs[current];
+  document.getElementById('progFill').style.width=(current/QN*100)+'%';
+  document.getElementById('quizCounter').textContent='Q '+(current+1)+' / '+QN;
+  document.getElementById('qNum').textContent='Question '+(current+1);
+  document.getElementById('qText').textContent=q.q;
+  const L=['A','B','C','D'];
+  document.getElementById('options').innerHTML=q.opts.map((opt,i)=>
+    `<div class="option" id="opt${i}" onclick="selectAnswer(${i})"><div class="opt-letter">${L[i]}</div><div class="opt-text">${opt}</div></div>`
+  ).join('');
+  const nb=document.getElementById('nextBtn');
+  nb.classList.remove('visible');
+  nb.textContent=current===QN-1?'See Results \u2713':'Next Question \u2192';
+  document.querySelector('.quiz-body').scrollTop=0;
+  sv(SK.session,{quizQs,current,answers,isWeighted});
+}
+
+/* ============================================================
+   SELECT
+   ============================================================ */
+function selectAnswer(i){
+  if(answers[current]!==-1)return;
+  answers[current]=i;
+  const q=quizQs[current],correct=q.ans;
+  // Update weights
+  const w=ld(SK.weights)||{};
+  if(i!==correct){w[q.origIdx]=(w[q.origIdx]||0)+1;}
+  else if(w[q.origIdx]>0){w[q.origIdx]=Math.max(0,w[q.origIdx]-1);if(w[q.origIdx]===0)delete w[q.origIdx];}
+  sv(SK.weights,w);
+  // Show feedback
+  document.querySelectorAll('.option').forEach((el,idx)=>{
+    el.style.pointerEvents='none';
+    if(idx===correct)el.classList.add(idx===i?'correct':'reveal-correct');
+    if(idx===i&&i!==correct)el.classList.add('wrong');
+  });
+  document.getElementById('nextBtn').classList.add('visible');
+  sv(SK.session,{quizQs,current,answers,isWeighted});
+}
+
+/* ============================================================
+   NEXT
+   ============================================================ */
+function nextQuestion(){
+  if(current===QN-1){showResults();return;}
+  current++;renderQuestion();
+}
+
+/* ============================================================
+   FINISH MODAL
+   ============================================================ */
+function confirmFinish(){document.getElementById('finishModal').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function finishEarly(){closeModal('finishModal');showResults();}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function showResults(){
+  discardSession();
+  const totalAns=answers.filter(a=>a!==-1).length;
+  const correct=answers.filter((a,i)=>a!==-1&&a===quizQs[i].ans).length;
+  const wrong=totalAns-correct;
+  const skipped=QN-totalAns;
+  const pct=totalAns>0?Math.round(correct/totalAns*100):0;
+  const pass=pct>=75;
+  // Save history
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  const hist=ld(SK.history)||[];
+  hist.push({date:dateStr,correct,total:totalAns,pct,weighted:isWeighted});
+  if(hist.length>100)hist.shift();
+  sv(SK.history,hist);
+  // UI
+  document.getElementById('resIcon').textContent=pass?'\uD83C\uDFC6':'\uD83D\uDCCB';
+  document.getElementById('resTitle').textContent=pass?'Well Done!':'Keep Practising';
+  document.getElementById('resSub').textContent=pass?"You'd pass the real exam on this score.":'Aim for 75% or above in the real exam.';
+  const circ=339.3,arc=document.getElementById('ringArc');
+  arc.style.stroke=pass?'#4caf78':'#e05552';
+  arc.style.transition='none';arc.style.strokeDashoffset=circ;
+  setTimeout(()=>{arc.style.transition='stroke-dashoffset 1s ease';arc.style.strokeDashoffset=circ-(circ*pct/100);},50);
+  document.getElementById('ringPct').textContent=pct+'%';
+  document.getElementById('ringFrac').textContent=correct+'/'+totalAns;
+  document.getElementById('rCorrect').textContent=correct;
+  document.getElementById('rWrong').textContent=wrong;
+  document.getElementById('rAnswered').textContent=totalAns;
+  document.getElementById('rSkipped').textContent=skipped;
+  document.getElementById('passBanner').innerHTML=pass
+    ?`<div class="pass-banner">\u2713 Pass &mdash; ${pct}% exceeds the 75% threshold</div>`
+    :`<div class="fail-banner">\u2717 ${pct}% &mdash; ${75-pct} more percentage points needed to pass</div>`;
+  // Review wrong answers
+  const L=['A','B','C','D'];
+  const wrongItems=answers.map((a,i)=>({a,i})).filter(({a,i})=>a!==-1&&a!==quizQs[i].ans);
+  let rh='';
+  if(wrongItems.length){
+    rh=`<div class="review-hd">Review &mdash; ${wrongItems.length} incorrect</div>`;
+    wrongItems.forEach(({a,i})=>{
+      const q=quizQs[i];
+      rh+=`<div class="review-card"><div class="rev-q">${q.q}</div><div class="rev-a"><span class="rev-lbl">Your answer:</span><span class="rev-wrong">${L[a]}. ${q.opts[a]}</span></div><div class="rev-a"><span class="rev-lbl">Correct:</span><span class="rev-right">${L[q.ans]}. ${q.opts[q.ans]}</span></div></div>`;
+    });
+  }else if(totalAns>0){
+    rh='<div class="review-hd" style="text-align:center;color:var(--correct);padding:12px 0">\u2713 All answered questions were correct!</div>';
+  }
+  document.getElementById('reviewSection').innerHTML=rh;
+  show('results');
+}
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+function renderHistory(){
+  const hist=ld(SK.history)||[];
+  const el=document.getElementById('histList');
+  if(!hist.length){el.innerHTML='<div class="hist-empty">No attempts yet. Take your first quiz!</div>';return;}
+  let html=[...hist].reverse().map(r=>{
+    const cls=r.pct>=75?'pass':'fail';
+    const mode=r.weighted?' &middot; Weighted':'';
+    return`<div class="hist-row"><div class="hr-left"><div class="hr-date">${r.date}${mode}</div><div class="hr-detail">${r.correct} correct from ${r.total} answered</div></div><div class="hr-score ${cls}">${r.pct}%</div></div>`;
+  }).join('');
+  html+=`<button class="clear-btn" onclick="clearHistory()">Clear All History</button>`;
+  el.innerHTML=html;
+}
+function clearHistory(){
+  if(confirm('Clear all score history and difficulty weights?')){rm(SK.history);rm(SK.weights);renderHistory();renderHome();}
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderHome();
+</script>
+</body>
+</html>

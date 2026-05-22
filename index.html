@@ -195,6 +195,17 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 .qb-stat-pill .val.g{color:var(--correct)}.qb-stat-pill .val.r{color:var(--wrong)}
 .qb-stat-pill .lbl{font-size:11px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
 
+
+/* THRESHOLD SLIDER */
+.threshold-row{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.thresh-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.thresh-lbl{font-size:13px;color:var(--text2)}
+.thresh-val{font-size:12px;color:var(--acc);font-weight:700}
+.thresh-slider{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+.thresh-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer;box-shadow:0 0 0 3px var(--acc-dim)}
+.thresh-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer;border:none;box-shadow:0 0 0 3px var(--acc-dim)}
+.thresh-hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -219,10 +230,19 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
         <small>Questions you get wrong appear more often</small>
       </div>
       <label class="tog">
-        <input type="checkbox" id="weightedToggle">
+        <input type="checkbox" id="weightedToggle" onchange="onWeightedToggle(this)">
         <div class="tog-track"></div>
         <div class="tog-thumb"></div>
       </label>
+    </div>
+    <div class="threshold-row" id="thresholdRow" style="display:none">
+      <div class="thresh-labels">
+        <span class="thresh-lbl">Mastery threshold</span>
+        <span class="thresh-val" id="threshVal">3 correct to deprioritise</span>
+      </div>
+      <input type="range" id="threshSlider" min="1" max="10" value="3" class="thresh-slider"
+        oninput="updateThreshLabel(this.value)">
+      <div class="thresh-hint">Questions answered correctly this many times won&apos;t appear unless the pool runs short</div>
     </div>
   </div>
   <div id="recentList"></div>
@@ -701,15 +721,41 @@ function renderHome(){
 /* ============================================================
    WEIGHTED POOL
    ============================================================ */
+function getThreshold(){return parseInt(document.getElementById('threshSlider').value,10);}
+function onWeightedToggle(el){
+  document.getElementById('thresholdRow').style.display=el.checked?'block':'none';
+}
+function updateThreshLabel(v){
+  document.getElementById('threshVal').textContent=v+' correct to deprioritise';
+}
 function buildPool(){
   if(!isWeighted) return shuffle(QB.map((_,i)=>i)).slice(0,QN);
   const w=ld(SK.weights)||{};
-  const pool=[];
-  QB.forEach((_,i)=>{const t=1+(w[i]||0);for(let j=0;j<t;j++)pool.push(i);});
-  shuffle(pool);
-  const seen=new Set(),picked=[];
-  for(const idx of pool){if(!seen.has(idx)){seen.add(idx);picked.push(idx);}if(picked.length===QN)break;}
-  if(picked.length<QN){const rest=shuffle(QB.map((_,i)=>i).filter(i=>!seen.has(i)));picked.push(...rest.slice(0,QN-picked.length));}
+  const qs=ld(SK.qstats)||{};
+  const threshold=getThreshold();
+  // Split into priority tiers
+  const hot=[];   // wrong-heavy or unseen — always prioritised
+  const warm=[];  // some correct but below threshold
+  const cold=[];  // mastered (correct >= threshold, no recent wrongs)
+  QB.forEach((_,i)=>{
+    const stat=qs[i]||{c:0,w:0};
+    const wt=w[i]||0;
+    if(wt>0){
+      // Has wrong answers — weighted repeat pool
+      for(let j=0;j<1+wt;j++) hot.push(i);
+    } else if(stat.c>=threshold){
+      cold.push(i); // mastered
+    } else {
+      warm.push(i); // not yet mastered, not recently wrong
+    }
+  });
+  shuffle(hot); shuffle(warm); shuffle(cold);
+  // Fill 40 slots: hot first, then warm, then cold as fallback
+  const seen=new Set(), picked=[];
+  const addUnique=(arr)=>{for(const idx of arr){if(!seen.has(idx)){seen.add(idx);picked.push(idx);}if(picked.length===QN)break;}};
+  addUnique(hot);
+  addUnique(warm);
+  addUnique(cold); // only reached if hot+warm don't fill 40
   return picked;
 }
 

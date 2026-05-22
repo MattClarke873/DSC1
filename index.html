@@ -729,34 +729,43 @@ function updateThreshLabel(v){
   document.getElementById('threshVal').textContent=v+' correct to deprioritise';
 }
 function buildPool(){
-  if(!isWeighted) return shuffle(QB.map((_,i)=>i)).slice(0,QN);
+  const allIdx = shuffle(QB.map((_,i)=>i)); // always start with a fresh full shuffle
+  if(!isWeighted) return allIdx.slice(0,QN);
+
   const w=ld(SK.weights)||{};
   const qs=ld(SK.qstats)||{};
   const threshold=getThreshold();
-  // Split into priority tiers
-  const hot=[];   // wrong-heavy or unseen — always prioritised
-  const warm=[];  // some correct but below threshold
-  const cold=[];  // mastered (correct >= threshold, no recent wrongs)
-  QB.forEach((_,i)=>{
+
+  // Categorise each unique question index (no duplicates in any tier)
+  const hot=[];   // answered wrong recently — highest priority
+  const warm=[];  // seen but not yet mastered
+  const cold=[];  // mastered (correct >= threshold, no pending wrongs)
+  const unseen=[]; // never encountered
+
+  // Use allIdx (already shuffled) to iterate so order within each tier is random
+  allIdx.forEach(i=>{
     const stat=qs[i]||{c:0,w:0};
     const wt=w[i]||0;
     if(wt>0){
-      // Has wrong answers — weighted repeat pool
-      for(let j=0;j<1+wt;j++) hot.push(i);
+      hot.push(i);       // wrong answers pending
+    } else if(stat.c===0){
+      unseen.push(i);    // never attempted
     } else if(stat.c>=threshold){
-      cold.push(i); // mastered
+      cold.push(i);      // mastered
     } else {
-      warm.push(i); // not yet mastered, not recently wrong
+      warm.push(i);      // some correct, not yet mastered
     }
   });
-  shuffle(hot); shuffle(warm); shuffle(cold);
-  // Fill 40 slots: hot first, then warm, then cold as fallback
-  const seen=new Set(), picked=[];
-  const addUnique=(arr)=>{for(const idx of arr){if(!seen.has(idx)){seen.add(idx);picked.push(idx);}if(picked.length===QN)break;}};
-  addUnique(hot);
-  addUnique(warm);
-  addUnique(cold); // only reached if hot+warm don't fill 40
-  return picked;
+
+  // Fill 40 slots: hot → unseen → warm → cold (mastered only if we run short)
+  const picked=[];
+  const addAll=(arr)=>{for(const idx of arr){picked.push(idx);if(picked.length===QN)return;}};
+  addAll(hot);
+  addAll(unseen);
+  addAll(warm);
+  addAll(cold);
+
+  return picked.slice(0,QN);
 }
 
 /* ============================================================

@@ -215,7 +215,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 <div id="home" class="screen active">
   <div class="home-badge">DSC Level 1</div>
   <div class="home-title">Deer Stalking<br><strong>Certificate Quiz</strong></div>
-  <div class="home-sub">40 randomised questions &middot; exam simulation<br>Real exam pass mark: 75%</div>
+  <div class="home-sub">40 randomised questions &middot; exam simulation<br>Real exam pass mark: 80%</div>
   <div id="resumeBanner"></div>
   <div class="stats-row">
     <div class="stat-box"><div class="stat-val" id="sAttempts">0</div><div class="stat-lbl">Attempts</div></div>
@@ -675,7 +675,7 @@ function rm(k){try{localStorage.removeItem(k);}catch(e){}}
 /* ============================================================
    STATE
    ============================================================ */
-const QN=40;
+const QN=50;
 let quizQs=[],current=0,answers=[],isWeighted=false;
 
 /* ============================================================
@@ -705,7 +705,7 @@ function renderHome(){
   const recent=[...hist].reverse().slice(0,3);
   let rh=recent.length?'<div class="recent-hd">Recent attempts</div>':'';
   recent.forEach(r=>{
-    const cls=r.pct>=75?'pass':'fail';
+    const cls=r.pct>=80?'pass':'fail';
     rh+=`<div class="recent-row"><span class="recent-date">${r.date}${r.weighted?' &middot; W':''}</span><span class="recent-score ${cls}">${r.pct}% (${r.correct}/${r.total})</span></div>`;
   });
   document.getElementById('recentList').innerHTML=rh;
@@ -877,7 +877,7 @@ function showResults(){
   const wrong=totalAns-correct;
   const skipped=QN-totalAns;
   const pct=totalAns>0?Math.round(correct/totalAns*100):0;
-  const pass=pct>=75;
+  const pass=pct>=80;
   // Save history
   const now=new Date();
   const dateStr=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
@@ -888,7 +888,7 @@ function showResults(){
   // UI
   document.getElementById('resIcon').textContent=pass?'\uD83C\uDFC6':'\uD83D\uDCCB';
   document.getElementById('resTitle').textContent=pass?'Well Done!':'Keep Practising';
-  document.getElementById('resSub').textContent=pass?"You'd pass the real exam on this score.":'Aim for 75% or above in the real exam.';
+  document.getElementById('resSub').textContent=pass?"You'd pass the real exam on this score.":'Aim for 80% or above in the real exam.';
   const circ=339.3,arc=document.getElementById('ringArc');
   arc.style.stroke=pass?'#4caf78':'#e05552';
   arc.style.transition='none';arc.style.strokeDashoffset=circ;
@@ -900,8 +900,8 @@ function showResults(){
   document.getElementById('rAnswered').textContent=totalAns;
   document.getElementById('rSkipped').textContent=skipped;
   document.getElementById('passBanner').innerHTML=pass
-    ?`<div class="pass-banner">\u2713 Pass &mdash; ${pct}% exceeds the 75% threshold</div>`
-    :`<div class="fail-banner">\u2717 ${pct}% &mdash; ${75-pct} more percentage points needed to pass</div>`;
+    ?`<div class="pass-banner">\u2713 Pass &mdash; ${pct}% exceeds the 80% threshold</div>`
+    :`<div class="fail-banner">\u2717 ${pct}% &mdash; ${80-pct} more percentage points needed to pass</div>`;
   // Review wrong answers
   const L=['A','B','C','D'];
   const wrongItems=answers.map((a,i)=>({a,i})).filter(({a,i})=>a!==-1&&a!==quizQs[i].ans);
@@ -927,7 +927,7 @@ function renderHistory(){
   const el=document.getElementById('histList');
   if(!hist.length){el.innerHTML='<div class="hist-empty">No attempts yet. Take your first quiz!</div>';return;}
   let html=[...hist].reverse().map(r=>{
-    const cls=r.pct>=75?'pass':'fail';
+    const cls=r.pct>=80?'pass':'fail';
     const mode=r.weighted?' &middot; Weighted':'';
     return`<div class="hist-row"><div class="hr-left"><div class="hr-date">${r.date}${mode}</div><div class="hr-detail">${r.correct} correct from ${r.total} answered</div></div><div class="hr-score ${cls}">${r.pct}%</div></div>`;
   }).join('');

@@ -6,7 +6,7 @@
    been retained here to faithfully match the source.
    Each entry: q = question text, o = options array, a = correct answer index
    ============================================================ */
-const QB2024 = [
+const QB = [
 {q:"What are normally the last deer to change from winter coat into summer coat?",o:["Male deer","Young deer","Female deer","Old deer"],a:3},
 {q:"Which male antlered deer usually cast their antlers first?",o:["Kids","Old animals","Perruques","Yearlings"],a:1},
 {q:"Under what circumstances do female deer usually give birth to their young?",o:["In the middle of the herd for protection","Quietly and alone in cover","Out in the open where she can see danger approaching","With the buck in close attendance waiting to breed afterwards"],a:1},

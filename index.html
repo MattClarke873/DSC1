@@ -279,7 +279,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 <div id="home" class="screen active">
   <div class="home-badge">DSC Level 1</div>
   <div class="home-title">Deer Stalking<br><strong>Certificate Quiz</strong></div>
-  <div class="home-sub">40 randomised questions &middot; exam simulation<br>Real exam pass mark: 80%</div>
+  <div class="home-sub">Knowledge: 50 questions &middot; pass 40/50 &nbsp;|&nbsp; Hygiene: 40 questions &middot; pass 32/40<br>Real exam pass mark: 80%</div>
   <div id="resumeBanner"></div>
   <div class="stats-row">
     <div class="stat-box"><div class="stat-val" id="sAttempts">0</div><div class="stat-lbl">Attempts</div></div>
@@ -550,7 +550,9 @@ function rm(k){try{localStorage.removeItem(k);}catch(e){}}
 /* ============================================================
    STATE
    ============================================================ */
-const QN=50;
+const QN_KNOWLEDGE=50; // Real exam: 40/50 correct to pass (80%)
+const QN_HYGIENE=40;   // Real exam: 32/40 correct to pass (80%)
+function QN(){return quizMode==='hygiene'?QN_HYGIENE:QN_KNOWLEDGE;}
 let quizQs=[],current=0,answers=[],isWeighted=false,quizMode='knowledge'; // mode: 'knowledge'|'hygiene'
 
 /* ============================================================
@@ -590,7 +592,7 @@ function renderHome(){
   if(sess){
     const done=sess.answers.filter(a=>a!==-1).length;
     const modeLabel=sess.quizMode==='hygiene'?'Hygiene Quiz':'Knowledge Quiz';
-    rb.innerHTML=`<div class="resume-banner"><div class="resume-info"><strong>${modeLabel} in progress</strong>Q${sess.current+1} of ${QN} &middot; ${done} answered</div><div class="resume-btns"><button class="btn-sm green" onclick="resumeSaved()">Resume</button><button class="btn-sm ghost" onclick="discardSession();renderHome()">Discard</button></div></div>`;
+    rb.innerHTML=`<div class="resume-banner"><div class="resume-info"><strong>${modeLabel} in progress</strong>Q${sess.current+1} of ${sess.quizQs.length} &middot; ${done} answered</div><div class="resume-btns"><button class="btn-sm green" onclick="resumeSaved()">Resume</button><button class="btn-sm ghost" onclick="discardSession();renderHome()">Discard</button></div></div>`;
   }else{rb.innerHTML='';}
 }
 
@@ -608,7 +610,7 @@ function buildPool(){
   const bank = quizMode==='hygiene' ? HQ : QB;
   const keys = quizMode==='hygiene' ? HK : SK;
   const allIdx = shuffle(bank.map((_,i)=>i));
-  if(!isWeighted) return allIdx.slice(0,QN);
+  if(!isWeighted) return allIdx.slice(0,QN());
 
   const w=ld(keys.weights)||{};
   const qs=ld(keys.qstats)||{};
@@ -634,13 +636,13 @@ function buildPool(){
   });
 
   const picked=[];
-  const addAll=(arr)=>{for(const idx of arr){picked.push(idx);if(picked.length===QN)return;}};
+  const addAll=(arr)=>{for(const idx of arr){picked.push(idx);if(picked.length===QN())return;}};
   addAll(hot);
   addAll(unseen);
   addAll(warm);
   addAll(cold);
 
-  return picked.slice(0,QN);
+  return picked.slice(0,QN());
 }
 
 /* ============================================================
@@ -666,7 +668,7 @@ function _startMCQ(){
     const sh=shuffle(indexed);
     return{origIdx:oi,q:q.q,opts:sh.map(x=>x.text),ans:sh.findIndex(x=>x.correct)};
   });
-  current=0;answers=new Array(QN).fill(-1);
+  current=0;answers=new Array(QN()).fill(-1);
   document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
   // colour the progress bar for hygiene
   document.getElementById('progFill').style.background = quizMode==='hygiene' ? 'var(--hyg)' : 'var(--acc)';
@@ -680,7 +682,7 @@ function pauseQuiz(){
   const keys = quizMode==='hygiene' ? HK : SK;
   sv(keys.session,{quizQs,current,answers,isWeighted,quizMode});
   const done=answers.filter(a=>a!==-1).length;
-  document.getElementById('pausedInfo').textContent=`Q${current+1} of ${QN} \u00b7 ${done} answered. Your progress is saved.`;
+  document.getElementById('pausedInfo').textContent=`Q${current+1} of ${QN()} \u00b7 ${done} answered. Your progress is saved.`;
   show('paused');
 }
 function resumeSaved(){
@@ -702,8 +704,8 @@ function discardSession(){rm(SK.session);rm(HK.session);}
    ============================================================ */
 function renderQuestion(){
   const q=quizQs[current];
-  document.getElementById('progFill').style.width=(current/QN*100)+'%';
-  document.getElementById('quizCounter').textContent='Q '+(current+1)+' / '+QN;
+  document.getElementById('progFill').style.width=(current/QN()*100)+'%';
+  document.getElementById('quizCounter').textContent='Q '+(current+1)+' / '+QN();
   document.getElementById('qNum').textContent='Question '+(current+1);
   document.getElementById('qText').textContent=q.q;
   const L=['A','B','C','D'];
@@ -712,7 +714,7 @@ function renderQuestion(){
   ).join('');
   const nb=document.getElementById('nextBtn');
   nb.classList.remove('visible');
-  nb.textContent=current===QN-1?'See Results \u2713':'Next Question \u2192';
+  nb.textContent=current===QN()-1?'See Results \u2713':'Next Question \u2192';
   document.querySelector('.quiz-body').scrollTop=0;
   sv(SK.session,{quizQs,current,answers,isWeighted});
 }
@@ -747,7 +749,7 @@ function selectAnswer(i){
    NEXT
    ============================================================ */
 function nextQuestion(){
-  if(current===QN-1){showResults();return;}
+  if(current===QN()-1){showResults();return;}
   current++;renderQuestion();
 }
 
@@ -767,7 +769,7 @@ function showResults(){
   const totalAns=answers.filter(a=>a!==-1).length;
   const correct=answers.filter((a,i)=>a!==-1&&a===quizQs[i].ans).length;
   const wrong=totalAns-correct;
-  const skipped=QN-totalAns;
+  const skipped=QN()-totalAns;
   const pct=totalAns>0?Math.round(correct/totalAns*100):0;
   const pass=pct>=80;
   const now=new Date();
@@ -776,9 +778,10 @@ function showResults(){
   hist.push({date:dateStr,correct,total:totalAns,pct,weighted:isWeighted,mode:quizMode});
   if(hist.length>100)hist.shift();
   sv(keys.history,hist);
+  const passTarget = quizMode==='hygiene' ? '32 out of 40' : '40 out of 50';
   document.getElementById('resIcon').textContent=pass?'\uD83C\uDFC6':'\uD83D\uDCCB';
   document.getElementById('resTitle').textContent=pass?'Well Done!':'Keep Practising';
-  document.getElementById('resSub').textContent=pass?"You'd pass the real exam on this score.":'Aim for 80% or above in the real exam.';
+  document.getElementById('resSub').textContent=pass?`You'd pass the real exam on this score.`:`Real exam requires ${passTarget} correct (80%).`;
   const circ=339.3,arc=document.getElementById('ringArc');
   arc.style.stroke=pass?(quizMode==='hygiene'?'var(--hyg)':'#4caf78'):'#e05552';
   arc.style.transition='none';arc.style.strokeDashoffset=circ;

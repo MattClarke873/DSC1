@@ -15,6 +15,7 @@
   --text:#e8ede9;--text2:#8a9e8e;--text3:#4a5e4e;
   --correct:#4caf78;--wrong:#e05552;
   --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+  --hyg:#c17f3a;--hyg-dim:#4a2e0d;--hyg-text:#0d0500;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none}
@@ -209,6 +210,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 
 /* SAFETY QUIZ */
 .btn-safety{background:#3a7fc1;margin-top:0}
+.btn-hygiene{background:var(--hyg);color:var(--hyg-text);margin-top:0}
 .sq-hd{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0}
 .sq-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .sq-left{display:flex;align-items:center;gap:8px}
@@ -311,9 +313,11 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   <div class="home-btns">
     <button class="btn-primary" onclick="startQuiz()">Start Knowledge Quiz</button>
     <button class="btn-primary btn-safety" onclick="startSafetyQuiz()">Start Safety Assessment</button>
+    <button class="btn-primary btn-hygiene" onclick="startHygQuiz()">Start Hygiene Quiz</button>
     <button class="btn-ghost" onclick="showHistory()">View Score History</button>
     <button class="btn-ghost" onclick="showQBank()">Knowledge Question Bank</button>
     <button class="btn-ghost" onclick="showSQBank()">Safety Question Bank</button>
+    <button class="btn-ghost" onclick="showHQBank()">Hygiene Question Bank</button>
   </div>
 </div>
 
@@ -485,8 +489,22 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   <div class="qb-body" id="sqBankBody"></div>
 </div>
 
+<!-- HYGIENE BANK -->
+<div id="hqbank" class="screen">
+  <div class="qb-hd">
+    <button class="back-btn" onclick="showHome()">&larr; Back</button>
+    <h2>Hygiene Questions</h2>
+  </div>
+  <div class="qb-filter-row">
+    <button class="qb-filter active" onclick="setHQFilter('all',this)">All <span id="hqfAll"></span></button>
+    <button class="qb-filter" onclick="setHQFilter('wrong',this)">Wrong <span id="hqfWrong"></span></button>
+    <button class="qb-filter" onclick="setHQFilter('correct',this)">Correct <span id="hqfCorrect"></span></button>
+    <button class="qb-filter" onclick="setHQFilter('unseen',this)">Unseen <span id="hqfUnseen"></span></button>
+  </div>
+  <div class="qb-body" id="hqbBody"></div>
 </div>
-<!-- QUESTION DETAIL OVERLAY -->
+
+</div>
 <div class="qb-detail-overlay" id="qbDetailOverlay">
   <div class="qb-detail-hd">
     <button class="back-btn" onclick="closeQDetail()">&larr; Back</button>
@@ -517,12 +535,14 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 <!-- Question banks loaded from external files -->
 <script src="KnowledgeQuestionBank.js"></script>
 <script src="SafetyQuestionBank.js"></script>
+<script src="HygieneQuestionBank.js"></script>
 
 <script>
 /* ============================================================
    STORAGE
    ============================================================ */
 const SK={history:'dsc1_hist',weights:'dsc1_wts',session:'dsc1_sess',qstats:'dsc1_qstats'};
+const HK={history:'dsc1_hyg_hist',weights:'dsc1_hyg_wts',session:'dsc1_hyg_sess',qstats:'dsc1_hyg_qstats'};
 function ld(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function rm(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -531,7 +551,7 @@ function rm(k){try{localStorage.removeItem(k);}catch(e){}}
    STATE
    ============================================================ */
 const QN=50;
-let quizQs=[],current=0,answers=[],isWeighted=false;
+let quizQs=[],current=0,answers=[],isWeighted=false,quizMode='knowledge'; // mode: 'knowledge'|'hygiene'
 
 /* ============================================================
    HELPERS
@@ -564,12 +584,13 @@ function renderHome(){
     rh+=`<div class="recent-row"><span class="recent-date">${r.date}${r.weighted?' &middot; W':''}</span><span class="recent-score ${cls}">${r.pct}% (${r.correct}/${r.total})</span></div>`;
   });
   document.getElementById('recentList').innerHTML=rh;
-  // Resume banner
-  const sess=ld(SK.session);
+  // Resume banner — check both knowledge and hygiene sessions
+  const sess=ld(SK.session)||ld(HK.session);
   const rb=document.getElementById('resumeBanner');
   if(sess){
     const done=sess.answers.filter(a=>a!==-1).length;
-    rb.innerHTML=`<div class="resume-banner"><div class="resume-info"><strong>Quiz in progress</strong>Q${sess.current+1} of ${QN} &middot; ${done} answered</div><div class="resume-btns"><button class="btn-sm green" onclick="resumeSaved()">Resume</button><button class="btn-sm ghost" onclick="discardSession()">Discard</button></div></div>`;
+    const modeLabel=sess.quizMode==='hygiene'?'Hygiene Quiz':'Knowledge Quiz';
+    rb.innerHTML=`<div class="resume-banner"><div class="resume-info"><strong>${modeLabel} in progress</strong>Q${sess.current+1} of ${QN} &middot; ${done} answered</div><div class="resume-btns"><button class="btn-sm green" onclick="resumeSaved()">Resume</button><button class="btn-sm ghost" onclick="discardSession();renderHome()">Discard</button></div></div>`;
   }else{rb.innerHTML='';}
 }
 
@@ -584,11 +605,13 @@ function updateThreshLabel(v){
   document.getElementById('threshVal').textContent=v+' correct to deprioritise';
 }
 function buildPool(){
-  const allIdx = shuffle(QB.map((_,i)=>i));
+  const bank = quizMode==='hygiene' ? HQ : QB;
+  const keys = quizMode==='hygiene' ? HK : SK;
+  const allIdx = shuffle(bank.map((_,i)=>i));
   if(!isWeighted) return allIdx.slice(0,QN);
 
-  const w=ld(SK.weights)||{};
-  const qs=ld(SK.qstats)||{};
+  const w=ld(keys.weights)||{};
+  const qs=ld(keys.qstats)||{};
   const threshold=getThreshold();
 
   const hot=[];
@@ -624,17 +647,29 @@ function buildPool(){
    START
    ============================================================ */
 function startQuiz(){
+  quizMode='knowledge';
+  _startMCQ();
+}
+function startHygQuiz(){
+  quizMode='hygiene';
+  _startMCQ();
+}
+function _startMCQ(){
+  const keys = quizMode==='hygiene' ? HK : SK;
+  const bank = quizMode==='hygiene' ? HQ : QB;
   discardSession();
   isWeighted=document.getElementById('weightedToggle').checked;
   const indices=buildPool();
   quizQs=indices.map(oi=>{
-    const q=QB[oi];
+    const q=bank[oi];
     const indexed=q.o.map((text,i)=>({text,correct:i===q.a}));
     const sh=shuffle(indexed);
     return{origIdx:oi,q:q.q,opts:sh.map(x=>x.text),ans:sh.findIndex(x=>x.correct)};
   });
   current=0;answers=new Array(QN).fill(-1);
   document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
+  // colour the progress bar for hygiene
+  document.getElementById('progFill').style.background = quizMode==='hygiene' ? 'var(--hyg)' : 'var(--acc)';
   show('quiz');renderQuestion();
 }
 
@@ -642,20 +677,25 @@ function startQuiz(){
    PAUSE / RESUME
    ============================================================ */
 function pauseQuiz(){
-  sv(SK.session,{quizQs,current,answers,isWeighted});
+  const keys = quizMode==='hygiene' ? HK : SK;
+  sv(keys.session,{quizQs,current,answers,isWeighted,quizMode});
   const done=answers.filter(a=>a!==-1).length;
   document.getElementById('pausedInfo').textContent=`Q${current+1} of ${QN} \u00b7 ${done} answered. Your progress is saved.`;
   show('paused');
 }
 function resumeSaved(){
-  const sess=ld(SK.session);
+  // try knowledge session first, then hygiene
+  let sess=ld(SK.session);
+  if(!sess) sess=ld(HK.session);
   if(!sess){showHome();return;}
   quizQs=sess.quizQs;current=sess.current;answers=sess.answers;isWeighted=sess.isWeighted||false;
+  quizMode=sess.quizMode||'knowledge';
   document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
+  document.getElementById('progFill').style.background = quizMode==='hygiene' ? 'var(--hyg)' : 'var(--acc)';
   show('quiz');renderQuestion();
 }
 function abandonQuiz(){discardSession();showHome();}
-function discardSession(){rm(SK.session);}
+function discardSession(){rm(SK.session);rm(HK.session);}
 
 /* ============================================================
    RENDER QUESTION
@@ -683,22 +723,24 @@ function renderQuestion(){
 function selectAnswer(i){
   if(answers[current]!==-1)return;
   answers[current]=i;
+  const keys = quizMode==='hygiene' ? HK : SK;
   const q=quizQs[current],correct=q.ans;
-  const w=ld(SK.weights)||{};
+  const w=ld(keys.weights)||{};
   if(i!==correct){w[q.origIdx]=(w[q.origIdx]||0)+1;}
   else if(w[q.origIdx]>0){w[q.origIdx]=Math.max(0,w[q.origIdx]-1);if(w[q.origIdx]===0)delete w[q.origIdx];}
-  sv(SK.weights,w);
-  const qs=ld(SK.qstats)||{};
+  sv(keys.weights,w);
+  const qs=ld(keys.qstats)||{};
   if(!qs[q.origIdx]) qs[q.origIdx]={c:0,w:0};
   if(i===correct) qs[q.origIdx].c++; else qs[q.origIdx].w++;
-  sv(SK.qstats,qs);
+  sv(keys.qstats,qs);
   document.querySelectorAll('.option').forEach((el,idx)=>{
     el.style.pointerEvents='none';
     if(idx===correct)el.classList.add(idx===i?'correct':'reveal-correct');
     if(idx===i&&i!==correct)el.classList.add('wrong');
   });
   document.getElementById('nextBtn').classList.add('visible');
-  sv(SK.session,{quizQs,current,answers,isWeighted});
+  const sessionKeys = quizMode==='hygiene' ? HK : SK;
+  sv(sessionKeys.session,{quizQs,current,answers,isWeighted,quizMode});
 }
 
 /* ============================================================
@@ -721,6 +763,7 @@ function finishEarly(){closeModal('finishModal');showResults();}
    ============================================================ */
 function showResults(){
   discardSession();
+  const keys = quizMode==='hygiene' ? HK : SK;
   const totalAns=answers.filter(a=>a!==-1).length;
   const correct=answers.filter((a,i)=>a!==-1&&a===quizQs[i].ans).length;
   const wrong=totalAns-correct;
@@ -729,15 +772,15 @@ function showResults(){
   const pass=pct>=80;
   const now=new Date();
   const dateStr=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const hist=ld(SK.history)||[];
-  hist.push({date:dateStr,correct,total:totalAns,pct,weighted:isWeighted});
+  const hist=ld(keys.history)||[];
+  hist.push({date:dateStr,correct,total:totalAns,pct,weighted:isWeighted,mode:quizMode});
   if(hist.length>100)hist.shift();
-  sv(SK.history,hist);
+  sv(keys.history,hist);
   document.getElementById('resIcon').textContent=pass?'\uD83C\uDFC6':'\uD83D\uDCCB';
   document.getElementById('resTitle').textContent=pass?'Well Done!':'Keep Practising';
   document.getElementById('resSub').textContent=pass?"You'd pass the real exam on this score.":'Aim for 80% or above in the real exam.';
   const circ=339.3,arc=document.getElementById('ringArc');
-  arc.style.stroke=pass?'#4caf78':'#e05552';
+  arc.style.stroke=pass?(quizMode==='hygiene'?'var(--hyg)':'#4caf78'):'#e05552';
   arc.style.transition='none';arc.style.strokeDashoffset=circ;
   setTimeout(()=>{arc.style.transition='stroke-dashoffset 1s ease';arc.style.strokeDashoffset=circ-(circ*pct/100);},50);
   document.getElementById('ringPct').textContent=pct+'%';
@@ -762,6 +805,17 @@ function showResults(){
     rh='<div class="review-hd" style="text-align:center;color:var(--correct);padding:12px 0">\u2713 All answered questions were correct!</div>';
   }
   document.getElementById('reviewSection').innerHTML=rh;
+  // Update New Quiz button to restart same mode
+  const nb = document.querySelector('#results .btn-primary');
+  if(quizMode==='hygiene'){
+    nb.textContent='New Hygiene Quiz';
+    nb.className='btn-primary btn-hygiene';
+    nb.onclick=startHygQuiz;
+  } else {
+    nb.textContent='New Quiz';
+    nb.className='btn-primary';
+    nb.onclick=startQuiz;
+  }
   show('results');
 }
 
@@ -1086,6 +1140,91 @@ function showSQDetail(id){
   document.getElementById('qbDetailOpts').innerHTML = bHtml;
   document.getElementById('qbDetailC').textContent = '—';
   document.getElementById('qbDetailW').textContent = '—';
+  overlay.classList.add('show');
+}
+
+/* ============================================================
+   HYGIENE QUESTION BANK
+   ============================================================ */
+let hqFilter='all';
+
+function showHQBank(){renderHQBank();show('hqbank');}
+
+function setHQFilter(f,btn){
+  hqFilter=f;
+  document.querySelectorAll('#hqbank .qb-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHQBankList();
+}
+
+function renderHQBank(){
+  const qs=ld(HK.qstats)||{};
+  let all=0,wrong=0,correct=0,unseen=0;
+  HQ.forEach((_,i)=>{
+    all++;
+    const s=qs[i];
+    if(!s){unseen++;}
+    else if(s.w>0&&s.c===0){wrong++;}
+    else if(s.w>0&&s.c>0){wrong++;correct++;}
+    else if(s.c>0){correct++;}
+  });
+  document.getElementById('hqfAll').textContent='('+all+')';
+  document.getElementById('hqfWrong').textContent='('+wrong+')';
+  document.getElementById('hqfCorrect').textContent='('+correct+')';
+  document.getElementById('hqfUnseen').textContent='('+unseen+')';
+  renderHQBankList();
+}
+
+function renderHQBankList(){
+  const qs=ld(HK.qstats)||{};
+  const L=['A','B','C','D'];
+  let html='';
+  let count=0;
+  HQ.forEach((q,i)=>{
+    const s=qs[i];
+    const hasCorrect=s&&s.c>0;
+    const hasWrong=s&&s.w>0;
+    const unseen=!s;
+    if(hqFilter==='wrong'&&!hasWrong) return;
+    if(hqFilter==='correct'&&!hasCorrect) return;
+    if(hqFilter==='unseen'&&!unseen) return;
+    count++;
+    let statusClass='unseen',statusIcon='&mdash;',itemClass='unseen';
+    if(hasWrong&&hasCorrect){statusClass='mixed';statusIcon='~';itemClass='has-wrong';}
+    else if(hasWrong){statusClass='wrong';statusIcon='&times;';itemClass='has-wrong';}
+    else if(hasCorrect){statusClass='correct';statusIcon='&check;';itemClass='has-correct';}
+    const tally=s?`<div class="qb-tally"><span class="qb-tally-c">&#10003; ${s.c}</span><span class="qb-tally-w">&#10007; ${s.w}</span></div>`:'<div class="qb-tally" style="color:var(--text3);font-size:12px">Not yet attempted</div>';
+    html+=`<div class="qb-item ${itemClass}" onclick="showHQDetail(${i})">
+      <div class="qb-status ${statusClass}">${statusIcon}</div>
+      <div class="qb-info">
+        <div class="qb-qnum">H${i+1}</div>
+        <div class="qb-qtext">${q.q}</div>
+        ${tally}
+      </div>
+    </div>`;
+  });
+  if(count===0) html='<div style="color:var(--text3);text-align:center;padding:40px 20px;font-size:15px">No questions in this category yet.</div>';
+  document.getElementById('hqbBody').innerHTML=html;
+}
+
+function showHQDetail(i){
+  const q=HQ[i];
+  const qs=ld(HK.qstats)||{};
+  const s=qs[i]||{c:0,w:0};
+  const L=['A','B','C','D'];
+  const overlay=document.getElementById('qbDetailOverlay');
+  document.getElementById('qbDetailQnum').textContent='Hygiene Question H'+(i+1)+' of '+HQ.length;
+  document.getElementById('qbDetailQ').textContent=q.q;
+  const opts=q.o.map((opt,j)=>{
+    const isCor=j===q.a;
+    return`<div class="qb-detail-opt${isCor?' correct':''}">
+      <div class="qb-dl">${L[j]}</div>
+      <div class="qb-dt">${opt}${isCor?' &check;':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('qbDetailOpts').innerHTML=opts;
+  document.getElementById('qbDetailC').textContent=s.c;
+  document.getElementById('qbDetailW').textContent=s.w;
   overlay.classList.add('show');
 }
 

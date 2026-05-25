@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Deer Calendar</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap');
+
+/* ══════════════════════════════════════════
+   PRINT — A4 landscape, single page
+   277mm × 190mm usable (10mm margins)
+   ══════════════════════════════════════════ */
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+@media print {
+  :root {
+    /* Recalculate in mm for print precision:
+       277mm usable width: label=24mm, 12 cols = (277-24)/12 = 21.1mm each */
+    --label-w: 24mm;
+    --month-w: 21mm;
+    --bar-h:   3.5mm;
+    --gap:     0.6mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 7pt;
+  }
+
+  .no-print { display: none !important; }
+
+  .scroll {
+    overflow: visible !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .cal {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  .month-header {
+    position: static !important;
+  }
+
+  .row-label {
+    position: static !important;
+  }
+
+  .lh {
+    position: static !important;
+  }
+
+  .title        { font-size: 16pt !important; }
+  .subtitle     { font-size: 6pt !important;  }
+  .legend       { margin-bottom: 2mm !important; gap: 2mm 4mm !important; }
+  .legend-item  { font-size: 6pt !important; }
+  .bar-demo     { width: 14mm !important; height: 3mm !important; font-size: 5pt !important; }
+  .mh           { font-size: 6.5pt !important; padding: 1.5mm 0 !important; }
+  .sp-name      { font-size: 7pt !important; }
+  .sex-tag      { font-size: 5.5pt !important; padding: 0.3mm 1.5mm !important; }
+  .bar          { font-size: 5.5pt !important; margin: 0 0.6mm !important; }
+  .species-group{ border-bottom-width: 1.5mm !important; }
+  .footnotes    { font-size: 5.5pt !important; margin-top: 2mm !important; line-height: 1.5 !important; }
+  .header       { margin-bottom: 2mm !important; }
+}
+
+/* ══════════════════════════════════════════
+   SCREEN VARIABLES
+   ══════════════════════════════════════════ */
+:root {
+  --bg:       #0d0f0e;
+  --surf2:    #1e2420;
+  --border:   #232e26;
+  --text:     #e8ede9;
+  --text2:    #8a9e8e;
+  --text3:    #4a5e4e;
+
+  --red:       #e07070; --red-bg:      rgba(224,112,112,0.07);
+  --fallow:    #b08ee0; --fallow-bg:   rgba(176,142,224,0.07);
+  --sika:      #60c8c8; --sika-bg:     rgba(96,200,200,0.07);
+  --roe:       #4caf78; --roe-bg:      rgba(76,175,120,0.07);
+  --muntjac:   #e0b860; --muntjac-bg:  rgba(224,184,96,0.07);
+  --cwd:       #90c840; --cwd-bg:      rgba(144,200,64,0.07);
+
+  /* Season=red, Rut=green (swapped) */
+  --c-season:  #e07070;
+  --c-rut:     #4caf78;
+  --c-birth:   #60b8e0;
+  --c-velvet:  #b08ee0;
+  --c-cast:    #e0b860;
+
+  --label-w: 108px;
+  --month-w:  79px;
+  --bar-h:    14px;
+  --gap:       2px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  padding: 20px 16px 40px;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: var(--roe);
+  line-height: 1.1;
+}
+.subtitle {
+  font-size: 9px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+/* ── Print button ── */
+.print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  background: rgba(76,175,120,0.12);
+  border: 1px solid rgba(76,175,120,0.35);
+  color: var(--roe);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.print-btn:hover { background: rgba(76,175,120,0.2); }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-bottom: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: var(--text2);
+}
+.bar-demo {
+  height: 13px;
+  width: 48px;
+  border-radius: 100px;
+  font-size: 7px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+}
+
+/* ── Scroll wrapper (screen only) ── */
+.scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.cal {
+  min-width: calc(var(--label-w) + var(--month-w) * 12);
+  width: 100%;
+}
+
+/* ── Month header ── */
+.month-header {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  background: var(--surf2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.lh {
+  width: var(--label-w);
+  min-width: var(--label-w);
+  flex-shrink: 0;
+  background: var(--surf2);
+  position: sticky;
+  left: 0;
+  z-index: 11;
+  border-right: 2px solid var(--border);
+}
+.mh {
+  width: var(--month-w);
+  min-width: var(--month-w);
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 8px 0;
+  border-right: 1px solid var(--border);
+  color: var(--text3);
+}
+.mh:last-child { border-right: none; }
+.mh.q1 { color: #6a9e9e; }
+.mh.q2 { color: #8ea86a; }
+.mh.q3 { color: #b89060; }
+.mh.q4 { color: #7a6aae; }
+
+/* ── Species group ── */
+.species-group { border-bottom: 4px solid var(--bg); }
+.species-group:last-child { border-bottom: none; }
+
+/* ── Row ── */
+.row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+
+/* ── Label ── */
+.row-label {
+  width: var(--label-w);
+  min-width: var(--label-w);
+  flex-shrink: 0;
+  padding: 5px 8px 5px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  border-right: 2px solid var(--border);
+}
+.sp-name {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.sex-tag {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 100px;
+  width: fit-content;
+}
+.sex-m { background: rgba(74,143,193,0.18); color: #6ab0d8; }
+.sex-f { background: rgba(193,127,74,0.18);  color: #d89060; }
+
+/* ── Grid ── */
+.row-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, var(--month-w));
+  position: relative;
+  padding: var(--gap) 0;
+  align-content: start;
+  gap: var(--gap) 0;
+}
+
+/* Vertical month dividers */
+.row-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent calc(var(--month-w) - 1px),
+    var(--border) calc(var(--month-w) - 1px),
+    var(--border) var(--month-w)
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Phase bar ── */
+.bar {
+  height: var(--bar-h);
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  margin: 0 3px;
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Season=red, Rut=green */
+.bar-season { background: rgba(224,112,112,0.22); color: var(--c-season); border: 1px solid rgba(224,112,112,0.4); }
+.bar-rut    { background: rgba(76,175,120,0.22);  color: var(--c-rut);    border: 1px solid rgba(76,175,120,0.4); }
+.bar-birth  { background: rgba(96,184,224,0.22);  color: var(--c-birth);  border: 1px solid rgba(96,184,224,0.4); }
+.bar-velvet { background: rgba(176,142,224,0.22); color: var(--c-velvet); border: 1px solid rgba(176,142,224,0.4); }
+.bar-cast   { background: rgba(224,184,96,0.22);  color: var(--c-cast);   border: 1px solid rgba(224,184,96,0.4); }
+
+/* ── Species tints ── */
+.sp-red     .row-label { background: var(--red-bg);     border-left: 3px solid var(--red); }
+.sp-fallow  .row-label { background: var(--fallow-bg);  border-left: 3px solid var(--fallow); }
+.sp-sika    .row-label { background: var(--sika-bg);    border-left: 3px solid var(--sika); }
+.sp-roe     .row-label { background: var(--roe-bg);     border-left: 3px solid var(--roe); }
+.sp-muntjac .row-label { background: var(--muntjac-bg); border-left: 3px solid var(--muntjac); }
+.sp-cwd     .row-label { background: var(--cwd-bg);     border-left: 3px solid var(--cwd); }
+
+.sp-red     .row.male   .row-grid { background: #0e1111; }
+.sp-red     .row.female .row-grid { background: #111515; }
+.sp-fallow  .row.male   .row-grid { background: #0f0e14; }
+.sp-fallow  .row.female .row-grid { background: #111018; }
+.sp-sika    .row.male   .row-grid { background: #0d1313; }
+.sp-sika    .row.female .row-grid { background: #0e1616; }
+.sp-roe     .row.male   .row-grid { background: #0d1210; }
+.sp-roe     .row.female .row-grid { background: #0f1512; }
+.sp-muntjac .row.male   .row-grid { background: #111009; }
+.sp-muntjac .row.female .row-grid { background: #14130b; }
+.sp-cwd     .row.male   .row-grid { background: #0f1209; }
+.sp-cwd     .row.female .row-grid { background: #11140b; }
+
+/* ── Footnotes ── */
+.footnotes {
+  margin-top: 12px;
+  font-size: 8.5px;
+  color: var(--text3);
+  line-height: 1.7;
+}
+.footnotes b { color: var(--text2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">UK Deer Calendar</div>
+  <div class="subtitle">DSC Level 1 &nbsp;·&nbsp; England &amp; Wales &nbsp;·&nbsp; All six species</div>
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">&#128438; Print / Save as PDF &nbsp;(A4 landscape)</button>
+
+<div class="legend">
+  <div class="legend-item"><div class="bar-demo bar-season">Season</div>Open shooting season</div>
+  <div class="legend-item"><div class="bar-demo bar-rut">Rut</div>Rutting activity</div>
+  <div class="legend-item"><div class="bar-demo bar-birth">Birth</div>Young born</div>
+  <div class="legend-item"><div class="bar-demo bar-velvet">Velvet</div>Antlers in velvet</div>
+  <div class="legend-item"><div class="bar-demo bar-cast">Cast</div>Antlers cast</div>
+</div>
+
+<div class="scroll">
+  <div class="cal">
+    <div class="month-header">
+      <div class="lh"></div>
+      <div class="mh q4">Jan</div>
+      <div class="mh q1">Feb</div>
+      <div class="mh q1">Mar</div>
+      <div class="mh q1">Apr</div>
+      <div class="mh q2">May</div>
+      <div class="mh q2">Jun</div>
+      <div class="mh q2">Jul</div>
+      <div class="mh q3">Aug</div>
+      <div class="mh q3">Sep</div>
+      <div class="mh q3">Oct</div>
+      <div class="mh q4">Nov</div>
+      <div class="mh q4">Dec</div>
+    </div>
+    <div id="calBody"></div>
+  </div>
+</div>
+
+<div class="footnotes">
+  <p>† <b>Scotland:</b> Red/Sika stags 1 Jul–20 Oct &nbsp;·&nbsp; Red/Sika hinds 21 Oct–15 Feb &nbsp;·&nbsp; Roe buck 1 Apr–20 Oct &nbsp;·&nbsp; Roe doe 21 Oct–31 Mar &nbsp;·&nbsp; Muntjac &amp; CWD not established in Scotland.</p>
+  <p>† <b>CWD bucks</b> carry no antlers — elongated canine tusks instead. &nbsp;·&nbsp; <b>Roe</b> delayed implantation: fertilised Jul/Aug, kids born following May/Jun.</p>
+</div>
+
+<script>
+const ROW = { season:1, rut:2, birth:2, velvet:3, cast:4 };
+
+const SPECIES = [
+  {
+    name:'Red Deer', key:'sp-red', color:'#e07070',
+    rows:[
+      { sex:'Stag', type:'m', phases:[
+        { type:'season', label:'Season', start:8,  end:12 },
+        { type:'season', label:'Season', start:1,  end:4  },
+        { type:'rut',    label:'Rut',    start:10, end:11 },
+        { type:'velvet', label:'Velvet', start:4,  end:8  },
+        { type:'cast',   label:'Cast',   start:3,  end:5  },
+      ]},
+      { sex:'Hind', type:'f', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'birth',  label:'Birth',  start:6,  end:6  },
+      ]}
+    ]
+  },
+  {
+    name:'Fallow Deer', key:'sp-fallow', color:'#b08ee0',
+    rows:[
+      { sex:'Buck', type:'m', phases:[
+        { type:'season', label:'Season', start:8,  end:12 },
+        { type:'season', label:'Season', start:1,  end:4  },
+        { type:'rut',    label:'Rut',    start:10, end:11 },
+        { type:'velvet', label:'Velvet', start:4,  end:8  },
+        { type:'cast',   label:'Cast',   start:4,  end:5  },
+      ]},
+      { sex:'Doe', type:'f', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'birth',  label:'Birth',  start:6,  end:6  },
+      ]}
+    ]
+  },
+  {
+    name:'Sika Deer', key:'sp-sika', color:'#60c8c8',
+    rows:[
+      { sex:'Stag', type:'m', phases:[
+        { type:'season', label:'Season', start:8,  end:12 },
+        { type:'season', label:'Season', start:1,  end:4  },
+        { type:'rut',    label:'Rut',    start:10, end:11 },
+        { type:'velvet', label:'Velvet', start:4,  end:8  },
+        { type:'cast',   label:'Cast',   start:5,  end:6  },
+      ]},
+      { sex:'Hind', type:'f', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'birth',  label:'Birth',  start:6,  end:6  },
+      ]}
+    ]
+  },
+  {
+    name:'Roe Deer', key:'sp-roe', color:'#4caf78',
+    rows:[
+      { sex:'Buck', type:'m', phases:[
+        { type:'season', label:'Season', start:4,  end:10 },
+        { type:'rut',    label:'Rut',    start:7,  end:8  },
+        { type:'velvet', label:'Velvet', start:11, end:12 },
+        { type:'velvet', label:'Velvet', start:1,  end:3  },
+        { type:'cast',   label:'Cast',   start:10, end:11 },
+      ]},
+      { sex:'Doe', type:'f', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'birth',  label:'Birth',  start:5,  end:6  },
+      ]}
+    ]
+  },
+  {
+    name:'Muntjac', key:'sp-muntjac', color:'#e0b860',
+    rows:[
+      { sex:'Buck', type:'m', phases:[
+        { type:'season', label:'No close season', start:1, end:12 },
+        { type:'rut',    label:'Rut (all year)',  start:1, end:12 },
+        { type:'velvet', label:'Velvet',          start:5, end:6  },
+        { type:'cast',   label:'Cast',            start:4, end:5  },
+      ]},
+      { sex:'Doe', type:'f', phases:[
+        { type:'season', label:'No close season',  start:1, end:12 },
+        { type:'birth',  label:'Birth (all year)', start:1, end:12 },
+      ]}
+    ]
+  },
+  {
+    name:'Chinese Water', key:'sp-cwd', color:'#90c840',
+    rows:[
+      { sex:'Buck', type:'m', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'rut',    label:'Rut',    start:11, end:12 },
+      ]},
+      { sex:'Doe', type:'f', phases:[
+        { type:'season', label:'Season', start:11, end:12 },
+        { type:'season', label:'Season', start:1,  end:3  },
+        { type:'birth',  label:'Birth',  start:5,  end:6  },
+      ]}
+    ]
+  }
+];
+
+function build() {
+  const body = document.getElementById('calBody');
+  SPECIES.forEach(sp => {
+    const group = document.createElement('div');
+    group.className = 'species-group ' + sp.key;
+    sp.rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = `row ${row.type === 'm' ? 'male' : 'female'}`;
+      const label = document.createElement('div');
+      label.className = 'row-label';
+      label.innerHTML =
+        `<span class="sp-name" style="color:${sp.color}">${sp.name}</span>` +
+        `<span class="sex-tag sex-${row.type}">${row.type==='m'?'♂':'♀'} ${row.sex}</span>`;
+      rowEl.appendChild(label);
+      const grid = document.createElement('div');
+      grid.className = 'row-grid';
+      const maxR = Math.max(...row.phases.map(p => ROW[p.type]));
+      grid.style.gridTemplateRows = `repeat(${maxR}, calc(var(--bar-h) + var(--gap)*2))`;
+      row.phases.forEach(p => {
+        const bar = document.createElement('div');
+        bar.className = `bar bar-${p.type}`;
+        bar.style.gridColumn = `${p.start} / ${p.end + 1}`;
+        bar.style.gridRow    = ROW[p.type];
+        bar.textContent      = p.label;
+        grid.appendChild(bar);
+      });
+      rowEl.appendChild(grid);
+      group.appendChild(rowEl);
+    });
+    body.appendChild(group);
+  });
+}
+build();
+</script>
+</body>
+</html>

@@ -7,102 +7,78 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap');
 
-/* ══════════════════════════════════════════
+/* ══════════════════════════════════════
    PRINT — A4 landscape, single page
-   277mm × 190mm usable (10mm margins)
-   ══════════════════════════════════════════ */
-@page {
-  size: A4 landscape;
-  margin: 10mm;
-}
+   ══════════════════════════════════════ */
+@page { size: A4 landscape; margin: 10mm; }
 
 @media print {
   :root {
-    /* Recalculate in mm for print precision:
-       277mm usable width: label=24mm, 12 cols = (277-24)/12 = 21.1mm each */
-    --label-w: 24mm;
+    --label-w: 22mm;
     --month-w: 21mm;
-    --bar-h:   3.5mm;
-    --gap:     0.6mm;
+    --bar-h:   3.2mm;
+    --gap:     0.55mm;
+    --sp-gap:  1mm;
   }
-
   body {
     background: #fff !important;
     color: #111 !important;
     padding: 0 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 7pt;
   }
-
-  .no-print { display: none !important; }
-
-  .scroll {
-    overflow: visible !important;
-    border: none !important;
-    border-radius: 0 !important;
-  }
-
-  .cal {
-    min-width: unset !important;
-    width: 100% !important;
-  }
-
-  .month-header {
-    position: static !important;
-  }
-
-  .row-label {
-    position: static !important;
-  }
-
-  .lh {
-    position: static !important;
-  }
-
-  .title        { font-size: 16pt !important; }
-  .subtitle     { font-size: 6pt !important;  }
-  .legend       { margin-bottom: 2mm !important; gap: 2mm 4mm !important; }
-  .legend-item  { font-size: 6pt !important; }
-  .bar-demo     { width: 14mm !important; height: 3mm !important; font-size: 5pt !important; }
-  .mh           { font-size: 6.5pt !important; padding: 1.5mm 0 !important; }
-  .sp-name      { font-size: 7pt !important; }
-  .sex-tag      { font-size: 5.5pt !important; padding: 0.3mm 1.5mm !important; }
-  .bar          { font-size: 5.5pt !important; margin: 0 0.6mm !important; }
-  .species-group{ border-bottom-width: 1.5mm !important; }
-  .footnotes    { font-size: 5.5pt !important; margin-top: 2mm !important; line-height: 1.5 !important; }
-  .header       { margin-bottom: 2mm !important; }
+  .no-print    { display: none !important; }
+  .scroll      { overflow: visible !important; border: none !important; border-radius: 0 !important; }
+  .cal         { min-width: unset !important; width: 100% !important; }
+  .month-header{ position: static !important; }
+  .row-label   { position: static !important; }
+  .lh          { position: static !important; }
+  .title       { font-size: 14pt !important; margin-bottom: 1mm !important; }
+  .subtitle    { font-size: 5.5pt !important; }
+  .header      { margin-bottom: 1.5mm !important; }
+  .legend      { margin-bottom: 1.5mm !important; gap: 1.5mm 3mm !important; }
+  .legend-item { font-size: 5.5pt !important; gap: 1.5mm !important; }
+  .bar-demo    { width: 12mm !important; height: 2.8mm !important; font-size: 5pt !important; }
+  .mh          { font-size: 6pt !important; padding: 1mm 0 !important; }
+  .sp-name     { font-size: 6.5pt !important; }
+  .sex-tag     { font-size: 5pt !important; padding: 0.2mm 1.2mm !important; }
+  .bar         { font-size: 5pt !important; margin: 0 0.5mm !important; border-radius: 10mm !important; }
+  .species-group { border-bottom-width: 1mm !important; page-break-inside: avoid; }
+  .footnotes   { font-size: 5pt !important; margin-top: 1.5mm !important; line-height: 1.4 !important; }
+  /* Hide interactive handles when printing */
+  .handle      { display: none !important; }
 }
 
-/* ══════════════════════════════════════════
-   SCREEN VARIABLES
-   ══════════════════════════════════════════ */
+/* ══════════════════════════════════════
+   SCREEN
+   ══════════════════════════════════════ */
 :root {
-  --bg:       #0d0f0e;
-  --surf2:    #1e2420;
-  --border:   #232e26;
-  --text:     #e8ede9;
-  --text2:    #8a9e8e;
-  --text3:    #4a5e4e;
+  --bg:     #0d0f0e;
+  --surf2:  #1e2420;
+  --border: #232e26;
+  --text:   #e8ede9;
+  --text2:  #8a9e8e;
+  --text3:  #4a5e4e;
 
-  --red:       #e07070; --red-bg:      rgba(224,112,112,0.07);
-  --fallow:    #b08ee0; --fallow-bg:   rgba(176,142,224,0.07);
-  --sika:      #60c8c8; --sika-bg:     rgba(96,200,200,0.07);
-  --roe:       #4caf78; --roe-bg:      rgba(76,175,120,0.07);
-  --muntjac:   #e0b860; --muntjac-bg:  rgba(224,184,96,0.07);
-  --cwd:       #90c840; --cwd-bg:      rgba(144,200,64,0.07);
+  --red:       #e07070; --red-bg:     rgba(224,112,112,0.07);
+  --fallow:    #b08ee0; --fallow-bg:  rgba(176,142,224,0.07);
+  --sika:      #60c8c8; --sika-bg:    rgba(96,200,200,0.07);
+  --roe:       #4caf78; --roe-bg:     rgba(76,175,120,0.07);
+  --muntjac:   #e0b860; --muntjac-bg: rgba(224,184,96,0.07);
+  --cwd:       #90c840; --cwd-bg:     rgba(144,200,64,0.07);
 
-  /* Season=red, Rut=green (swapped) */
-  --c-season:  #e07070;
-  --c-rut:     #4caf78;
-  --c-birth:   #60b8e0;
-  --c-velvet:  #b08ee0;
-  --c-cast:    #e0b860;
+  /* Season=red, Rut=green */
+  --c-season: #e07070;
+  --c-rut:    #4caf78;
+  --c-birth:  #60b8e0;
+  --c-velvet: #b08ee0;
+  --c-cast:   #e0b860;
 
   --label-w: 108px;
   --month-w:  79px;
-  --bar-h:    14px;
+  --bar-h:    15px;
   --gap:       2px;
+  --sp-gap:    4px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -112,169 +88,111 @@ body {
   color: var(--text);
   font-family: 'DM Mono', monospace;
   padding: 20px 16px 40px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* ── Header ── */
-.header {
+/* Header */
+.header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.title  { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--roe); line-height: 1.1; }
+.subtitle { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.18em; }
+
+/* Toolbar */
+.toolbar {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
-.title {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  color: var(--roe);
-  line-height: 1.1;
-}
-.subtitle {
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-}
-
-/* ── Print button ── */
-.print-btn {
+.btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 12px;
   background: rgba(76,175,120,0.12);
   border: 1px solid rgba(76,175,120,0.35);
   color: var(--roe);
   font-family: 'DM Mono', monospace;
   font-size: 11px;
   font-weight: 500;
-  padding: 7px 14px;
+  padding: 6px 13px;
   border-radius: 8px;
   cursor: pointer;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
-.print-btn:hover { background: rgba(76,175,120,0.2); }
+.btn:hover { background: rgba(76,175,120,0.2); }
+.btn.danger { background: rgba(224,112,112,0.1); border-color: rgba(224,112,112,0.3); color: var(--c-season); }
+.btn.danger:hover { background: rgba(224,112,112,0.18); }
+.hint { font-size: 9px; color: var(--text3); letter-spacing: 0.05em; }
 
-/* ── Legend ── */
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-bottom: 12px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 9px;
-  color: var(--text2);
-}
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; color: var(--text2); }
 .bar-demo {
-  height: 13px;
-  width: 48px;
-  border-radius: 100px;
-  font-size: 7px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 13px; width: 52px; border-radius: 100px;
+  font-size: 7px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
   letter-spacing: 0.04em;
 }
 
-/* ── Scroll wrapper (screen only) ── */
+/* Scroll */
 .scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border);
   border-radius: 10px;
 }
-
 .cal {
   min-width: calc(var(--label-w) + var(--month-w) * 12);
   width: 100%;
 }
 
-/* ── Month header ── */
+/* Month header */
 .month-header {
   display: flex;
   border-bottom: 2px solid var(--border);
   background: var(--surf2);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: sticky; top: 0; z-index: 10;
 }
 .lh {
-  width: var(--label-w);
-  min-width: var(--label-w);
-  flex-shrink: 0;
+  width: var(--label-w); min-width: var(--label-w); flex-shrink: 0;
   background: var(--surf2);
-  position: sticky;
-  left: 0;
-  z-index: 11;
+  position: sticky; left: 0; z-index: 11;
   border-right: 2px solid var(--border);
 }
 .mh {
-  width: var(--month-w);
-  min-width: var(--month-w);
-  flex-shrink: 0;
-  text-align: center;
-  font-size: 9px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  width: var(--month-w); min-width: var(--month-w); flex-shrink: 0;
+  text-align: center; font-size: 9px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
   padding: 8px 0;
-  border-right: 1px solid var(--border);
-  color: var(--text3);
+  border-right: 1px solid var(--border); color: var(--text3);
 }
 .mh:last-child { border-right: none; }
-.mh.q1 { color: #6a9e9e; }
-.mh.q2 { color: #8ea86a; }
-.mh.q3 { color: #b89060; }
-.mh.q4 { color: #7a6aae; }
+.mh.q1{color:#6a9e9e}.mh.q2{color:#8ea86a}.mh.q3{color:#b89060}.mh.q4{color:#7a6aae}
 
-/* ── Species group ── */
-.species-group { border-bottom: 4px solid var(--bg); }
+/* Species group */
+.species-group { border-bottom: var(--sp-gap) solid var(--bg); }
 .species-group:last-child { border-bottom: none; }
 
-/* ── Row ── */
-.row {
-  display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid var(--border);
-}
+/* Row */
+.row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
 .row:last-child { border-bottom: none; }
 
-/* ── Label ── */
+/* Label */
 .row-label {
-  width: var(--label-w);
-  min-width: var(--label-w);
-  flex-shrink: 0;
+  width: var(--label-w); min-width: var(--label-w); flex-shrink: 0;
   padding: 5px 8px 5px 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  position: sticky;
-  left: 0;
-  z-index: 5;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  position: sticky; left: 0; z-index: 5;
   border-right: 2px solid var(--border);
 }
-.sp-name {
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-.sex-tag {
-  display: inline-block;
-  font-size: 8px;
-  font-weight: 500;
-  padding: 1px 6px;
-  border-radius: 100px;
-  width: fit-content;
-}
+.sp-name { font-size: 10px; font-weight: 500; line-height: 1.2; }
+.sex-tag { display: inline-block; font-size: 8px; font-weight: 500; padding: 1px 6px; border-radius: 100px; width: fit-content; }
 .sex-m { background: rgba(74,143,193,0.18); color: #6ab0d8; }
 .sex-f { background: rgba(193,127,74,0.18);  color: #d89060; }
 
-/* ── Grid ── */
+/* Grid */
 .row-grid {
   flex: 1;
   display: grid;
@@ -284,49 +202,62 @@ body {
   align-content: start;
   gap: var(--gap) 0;
 }
-
-/* Vertical month dividers */
 .row-grid::before {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-image: repeating-linear-gradient(
     to right,
-    transparent,
-    transparent calc(var(--month-w) - 1px),
-    var(--border) calc(var(--month-w) - 1px),
-    var(--border) var(--month-w)
+    transparent, transparent calc(var(--month-w) - 1px),
+    var(--border) calc(var(--month-w) - 1px), var(--border) var(--month-w)
   );
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
 }
 
-/* ── Phase bar ── */
+/* ── Bar (interactive) ── */
 .bar {
   height: var(--bar-h);
   border-radius: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 7.5px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7.5px; font-weight: 500; letter-spacing: 0.03em;
   margin: 0 3px;
-  position: relative;
-  z-index: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  position: relative; z-index: 2;
+  white-space: nowrap; overflow: hidden;
+  cursor: grab;
+  transition: filter 0.1s, box-shadow 0.1s;
 }
+.bar:hover { filter: brightness(1.2); box-shadow: 0 0 0 1.5px rgba(255,255,255,0.2); }
+.bar.dragging { cursor: grabbing; filter: brightness(1.3); box-shadow: 0 0 0 2px rgba(255,255,255,0.35); z-index: 20; }
 
-/* Season=red, Rut=green */
+/* Resize handles */
+.handle {
+  position: absolute; top: 0; bottom: 0;
+  width: 10px;
+  cursor: ew-resize;
+  z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.handle::after {
+  content: '';
+  width: 3px; height: 70%;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2px;
+}
+.bar:hover .handle,
+.bar.dragging .handle { opacity: 1; }
+.handle-l { left: 0; border-radius: 100px 0 0 100px; }
+.handle-r { right: 0; border-radius: 0 100px 100px 0; }
+.bar-label { flex: 1; text-align: center; pointer-events: none; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Phase colours */
 .bar-season { background: rgba(224,112,112,0.22); color: var(--c-season); border: 1px solid rgba(224,112,112,0.4); }
 .bar-rut    { background: rgba(76,175,120,0.22);  color: var(--c-rut);    border: 1px solid rgba(76,175,120,0.4); }
 .bar-birth  { background: rgba(96,184,224,0.22);  color: var(--c-birth);  border: 1px solid rgba(96,184,224,0.4); }
 .bar-velvet { background: rgba(176,142,224,0.22); color: var(--c-velvet); border: 1px solid rgba(176,142,224,0.4); }
 .bar-cast   { background: rgba(224,184,96,0.22);  color: var(--c-cast);   border: 1px solid rgba(224,184,96,0.4); }
 
-/* ── Species tints ── */
+/* Species row tints */
 .sp-red     .row-label { background: var(--red-bg);     border-left: 3px solid var(--red); }
 .sp-fallow  .row-label { background: var(--fallow-bg);  border-left: 3px solid var(--fallow); }
 .sp-sika    .row-label { background: var(--sika-bg);    border-left: 3px solid var(--sika); }
@@ -347,13 +278,48 @@ body {
 .sp-cwd     .row.male   .row-grid { background: #0f1209; }
 .sp-cwd     .row.female .row-grid { background: #11140b; }
 
-/* ── Footnotes ── */
-.footnotes {
-  margin-top: 12px;
-  font-size: 8.5px;
-  color: var(--text3);
-  line-height: 1.7;
+/* ── Colour Picker Popup ── */
+.colour-popup {
+  position: fixed;
+  background: #1a2020;
+  border: 1px solid #3a4a3a;
+  border-radius: 12px;
+  padding: 12px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
 }
+.colour-popup.show { display: flex; }
+.popup-title { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+.swatch-grid { display: grid; grid-template-columns: repeat(7, 22px); gap: 4px; }
+.swatch {
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s, border-color 0.1s;
+}
+.swatch:hover { transform: scale(1.2); }
+.swatch.active { border-color: #fff; }
+.popup-custom {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 9px; color: var(--text2);
+}
+.popup-custom input[type=color] {
+  width: 28px; height: 22px; border: none; border-radius: 5px;
+  background: none; cursor: pointer; padding: 0;
+}
+.popup-close {
+  align-self: flex-end;
+  font-size: 9px; color: var(--text3);
+  cursor: pointer; padding: 2px 6px;
+  border: 1px solid var(--border); border-radius: 5px;
+}
+.popup-close:hover { color: var(--text2); }
+
+/* Footnotes */
+.footnotes { margin-top: 12px; font-size: 8.5px; color: var(--text3); line-height: 1.7; }
 .footnotes b { color: var(--text2); }
 </style>
 </head>
@@ -364,7 +330,11 @@ body {
   <div class="subtitle">DSC Level 1 &nbsp;·&nbsp; England &amp; Wales &nbsp;·&nbsp; All six species</div>
 </div>
 
-<button class="print-btn no-print" onclick="window.print()">&#128438; Print / Save as PDF &nbsp;(A4 landscape)</button>
+<div class="toolbar no-print">
+  <button class="btn" onclick="window.print()">&#128438; Print / Save PDF &nbsp;(A4 landscape)</button>
+  <button class="btn danger" onclick="resetAll()">&#8635; Reset to defaults</button>
+  <span class="hint">Drag bars to move &nbsp;·&nbsp; Drag edges to resize &nbsp;·&nbsp; Click centre to change colour</span>
+</div>
 
 <div class="legend">
   <div class="legend-item"><div class="bar-demo bar-season">Season</div>Open shooting season</div>
@@ -378,18 +348,10 @@ body {
   <div class="cal">
     <div class="month-header">
       <div class="lh"></div>
-      <div class="mh q4">Jan</div>
-      <div class="mh q1">Feb</div>
-      <div class="mh q1">Mar</div>
-      <div class="mh q1">Apr</div>
-      <div class="mh q2">May</div>
-      <div class="mh q2">Jun</div>
-      <div class="mh q2">Jul</div>
-      <div class="mh q3">Aug</div>
-      <div class="mh q3">Sep</div>
-      <div class="mh q3">Oct</div>
-      <div class="mh q4">Nov</div>
-      <div class="mh q4">Dec</div>
+      <div class="mh q4">Jan</div><div class="mh q1">Feb</div><div class="mh q1">Mar</div>
+      <div class="mh q1">Apr</div><div class="mh q2">May</div><div class="mh q2">Jun</div>
+      <div class="mh q2">Jul</div><div class="mh q3">Aug</div><div class="mh q3">Sep</div>
+      <div class="mh q3">Oct</div><div class="mh q4">Nov</div><div class="mh q4">Dec</div>
     </div>
     <div id="calBody"></div>
   </div>
@@ -400,143 +362,412 @@ body {
   <p>† <b>CWD bucks</b> carry no antlers — elongated canine tusks instead. &nbsp;·&nbsp; <b>Roe</b> delayed implantation: fertilised Jul/Aug, kids born following May/Jun.</p>
 </div>
 
-<script>
-const ROW = { season:1, rut:2, birth:2, velvet:3, cast:4 };
+<!-- Colour picker popup -->
+<div class="colour-popup" id="colourPopup">
+  <div class="popup-title">Bar colour</div>
+  <div class="swatch-grid" id="swatchGrid"></div>
+  <div class="popup-custom">
+    <span>Custom:</span>
+    <input type="color" id="customColour" value="#4caf78">
+  </div>
+  <div class="popup-close" onclick="closePopup()">Close</div>
+</div>
 
-const SPECIES = [
-  {
-    name:'Red Deer', key:'sp-red', color:'#e07070',
+<script>
+/* ══════════════════════════════════════
+   DATA
+   ══════════════════════════════════════ */
+const ROW_SLOT = { season:1, rut:2, birth:2, velvet:3, cast:4 };
+
+const DEFAULTS = [
+  { name:'Red Deer',      key:'sp-red',     color:'#e07070',
     rows:[
       { sex:'Stag', type:'m', phases:[
-        { type:'season', label:'Season', start:8,  end:12 },
-        { type:'season', label:'Season', start:1,  end:4  },
-        { type:'rut',    label:'Rut',    start:10, end:11 },
-        { type:'velvet', label:'Velvet', start:4,  end:8  },
-        { type:'cast',   label:'Cast',   start:3,  end:5  },
+        { type:'season', label:'Season', start:8,  end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:4,  color:null },
+        { type:'rut',    label:'Rut',    start:10, end:11, color:null },
+        { type:'velvet', label:'Velvet', start:4,  end:8,  color:null },
+        { type:'cast',   label:'Cast',   start:3,  end:5,  color:null },
       ]},
       { sex:'Hind', type:'f', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'birth',  label:'Birth',  start:6,  end:6  },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'birth',  label:'Birth',  start:6,  end:6,  color:null },
       ]}
     ]
   },
-  {
-    name:'Fallow Deer', key:'sp-fallow', color:'#b08ee0',
+  { name:'Fallow Deer',   key:'sp-fallow',  color:'#b08ee0',
     rows:[
       { sex:'Buck', type:'m', phases:[
-        { type:'season', label:'Season', start:8,  end:12 },
-        { type:'season', label:'Season', start:1,  end:4  },
-        { type:'rut',    label:'Rut',    start:10, end:11 },
-        { type:'velvet', label:'Velvet', start:4,  end:8  },
-        { type:'cast',   label:'Cast',   start:4,  end:5  },
+        { type:'season', label:'Season', start:8,  end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:4,  color:null },
+        { type:'rut',    label:'Rut',    start:10, end:11, color:null },
+        { type:'velvet', label:'Velvet', start:4,  end:8,  color:null },
+        { type:'cast',   label:'Cast',   start:4,  end:5,  color:null },
       ]},
       { sex:'Doe', type:'f', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'birth',  label:'Birth',  start:6,  end:6  },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'birth',  label:'Birth',  start:6,  end:6,  color:null },
       ]}
     ]
   },
-  {
-    name:'Sika Deer', key:'sp-sika', color:'#60c8c8',
+  { name:'Sika Deer',     key:'sp-sika',    color:'#60c8c8',
     rows:[
       { sex:'Stag', type:'m', phases:[
-        { type:'season', label:'Season', start:8,  end:12 },
-        { type:'season', label:'Season', start:1,  end:4  },
-        { type:'rut',    label:'Rut',    start:10, end:11 },
-        { type:'velvet', label:'Velvet', start:4,  end:8  },
-        { type:'cast',   label:'Cast',   start:5,  end:6  },
+        { type:'season', label:'Season', start:8,  end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:4,  color:null },
+        { type:'rut',    label:'Rut',    start:10, end:11, color:null },
+        { type:'velvet', label:'Velvet', start:4,  end:8,  color:null },
+        { type:'cast',   label:'Cast',   start:5,  end:6,  color:null },
       ]},
       { sex:'Hind', type:'f', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'birth',  label:'Birth',  start:6,  end:6  },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'birth',  label:'Birth',  start:6,  end:6,  color:null },
       ]}
     ]
   },
-  {
-    name:'Roe Deer', key:'sp-roe', color:'#4caf78',
+  { name:'Roe Deer',      key:'sp-roe',     color:'#4caf78',
     rows:[
       { sex:'Buck', type:'m', phases:[
-        { type:'season', label:'Season', start:4,  end:10 },
-        { type:'rut',    label:'Rut',    start:7,  end:8  },
-        { type:'velvet', label:'Velvet', start:11, end:12 },
-        { type:'velvet', label:'Velvet', start:1,  end:3  },
-        { type:'cast',   label:'Cast',   start:10, end:11 },
+        { type:'season', label:'Season', start:4,  end:10, color:null },
+        { type:'rut',    label:'Rut',    start:7,  end:8,  color:null },
+        { type:'velvet', label:'Velvet', start:11, end:12, color:null },
+        { type:'velvet', label:'Velvet', start:1,  end:3,  color:null },
+        { type:'cast',   label:'Cast',   start:10, end:11, color:null },
       ]},
       { sex:'Doe', type:'f', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'birth',  label:'Birth',  start:5,  end:6  },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'birth',  label:'Birth',  start:5,  end:6,  color:null },
       ]}
     ]
   },
-  {
-    name:'Muntjac', key:'sp-muntjac', color:'#e0b860',
+  { name:'Muntjac',       key:'sp-muntjac', color:'#e0b860',
     rows:[
       { sex:'Buck', type:'m', phases:[
-        { type:'season', label:'No close season', start:1, end:12 },
-        { type:'rut',    label:'Rut (all year)',  start:1, end:12 },
-        { type:'velvet', label:'Velvet',          start:5, end:6  },
-        { type:'cast',   label:'Cast',            start:4, end:5  },
+        { type:'season', label:'No close season', start:1, end:12, color:null },
+        { type:'rut',    label:'Rut (all year)',  start:1, end:12, color:null },
+        { type:'velvet', label:'Velvet',          start:5, end:6,  color:null },
+        { type:'cast',   label:'Cast',            start:4, end:5,  color:null },
       ]},
       { sex:'Doe', type:'f', phases:[
-        { type:'season', label:'No close season',  start:1, end:12 },
-        { type:'birth',  label:'Birth (all year)', start:1, end:12 },
+        { type:'season', label:'No close season',  start:1, end:12, color:null },
+        { type:'birth',  label:'Birth (all year)', start:1, end:12, color:null },
       ]}
     ]
   },
-  {
-    name:'Chinese Water', key:'sp-cwd', color:'#90c840',
+  { name:'Chinese Water', key:'sp-cwd',     color:'#90c840',
     rows:[
       { sex:'Buck', type:'m', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'rut',    label:'Rut',    start:11, end:12 },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'rut',    label:'Rut',    start:11, end:12, color:null },
       ]},
       { sex:'Doe', type:'f', phases:[
-        { type:'season', label:'Season', start:11, end:12 },
-        { type:'season', label:'Season', start:1,  end:3  },
-        { type:'birth',  label:'Birth',  start:5,  end:6  },
+        { type:'season', label:'Season', start:11, end:12, color:null },
+        { type:'season', label:'Season', start:1,  end:3,  color:null },
+        { type:'birth',  label:'Birth',  start:5,  end:6,  color:null },
       ]}
     ]
   }
 ];
 
-function build() {
+// Deep clone for state
+let STATE = JSON.parse(JSON.stringify(DEFAULTS));
+
+/* Colour swatches */
+const SWATCHES = [
+  '#e07070','#e09060','#e0c060','#90c840',
+  '#4caf78','#60c8c8','#60a8e0','#b08ee0',
+  '#e070b0','#ffffff','#aaaaaa','#555555',
+  '#ff4444','#ff8800','#ffcc00','#00cc66',
+  '#00aaff','#8844ff','#ff44aa','#333333',
+  '#c84a4a','#c87a30','#9ab030','#309060',
+];
+
+/* Phase default colours */
+const PHASE_DEFAULTS = {
+  season: { bg:'rgba(224,112,112,0.22)', fg:'#e07070', border:'rgba(224,112,112,0.4)' },
+  rut:    { bg:'rgba(76,175,120,0.22)',  fg:'#4caf78', border:'rgba(76,175,120,0.4)'  },
+  birth:  { bg:'rgba(96,184,224,0.22)',  fg:'#60b8e0', border:'rgba(96,184,224,0.4)'  },
+  velvet: { bg:'rgba(176,142,224,0.22)', fg:'#b08ee0', border:'rgba(176,142,224,0.4)' },
+  cast:   { bg:'rgba(224,184,96,0.22)',  fg:'#e0b860', border:'rgba(224,184,96,0.4)'  },
+};
+
+/* ══════════════════════════════════════
+   MONTH WIDTH (live from CSS)
+   ══════════════════════════════════════ */
+function getMonthW() {
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--month-w')) || 79;
+}
+
+/* ══════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════ */
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function applyBarStyle(barEl, type, customColor) {
+  if (customColor) {
+    barEl.style.background = hexToRgba(customColor, 0.25);
+    barEl.style.color      = customColor;
+    barEl.style.borderColor= hexToRgba(customColor, 0.5);
+    barEl.className = 'bar'; // remove phase class
+  } else {
+    barEl.className = `bar bar-${type}`;
+    barEl.style.background = '';
+    barEl.style.color      = '';
+    barEl.style.borderColor= '';
+  }
+}
+
+function buildBar(si, ri, pi) {
+  const sp    = STATE[si];
+  const row   = sp.rows[ri];
+  const phase = row.phases[pi];
+
+  const bar = document.createElement('div');
+  bar.className = `bar bar-${phase.type}`;
+  bar.style.gridColumn = `${phase.start} / ${phase.end + 1}`;
+  bar.style.gridRow    = ROW_SLOT[phase.type];
+  bar.dataset.si = si; bar.dataset.ri = ri; bar.dataset.pi = pi;
+
+  if (phase.color) applyBarStyle(bar, phase.type, phase.color);
+
+  const handleL = document.createElement('div');
+  handleL.className = 'handle handle-l';
+
+  const labelEl = document.createElement('span');
+  labelEl.className = 'bar-label';
+  labelEl.textContent = phase.label;
+
+  const handleR = document.createElement('div');
+  handleR.className = 'handle handle-r';
+
+  bar.appendChild(handleL);
+  bar.appendChild(labelEl);
+  bar.appendChild(handleR);
+
+  attachBarEvents(bar, handleL, handleR);
+  return bar;
+}
+
+function renderAll() {
   const body = document.getElementById('calBody');
-  SPECIES.forEach(sp => {
+  body.innerHTML = '';
+
+  STATE.forEach((sp, si) => {
     const group = document.createElement('div');
     group.className = 'species-group ' + sp.key;
-    sp.rows.forEach(row => {
+
+    sp.rows.forEach((row, ri) => {
       const rowEl = document.createElement('div');
       rowEl.className = `row ${row.type === 'm' ? 'male' : 'female'}`;
+
       const label = document.createElement('div');
       label.className = 'row-label';
       label.innerHTML =
         `<span class="sp-name" style="color:${sp.color}">${sp.name}</span>` +
         `<span class="sex-tag sex-${row.type}">${row.type==='m'?'♂':'♀'} ${row.sex}</span>`;
       rowEl.appendChild(label);
+
       const grid = document.createElement('div');
       grid.className = 'row-grid';
-      const maxR = Math.max(...row.phases.map(p => ROW[p.type]));
+      const maxR = Math.max(...row.phases.map(p => ROW_SLOT[p.type]));
       grid.style.gridTemplateRows = `repeat(${maxR}, calc(var(--bar-h) + var(--gap)*2))`;
-      row.phases.forEach(p => {
-        const bar = document.createElement('div');
-        bar.className = `bar bar-${p.type}`;
-        bar.style.gridColumn = `${p.start} / ${p.end + 1}`;
-        bar.style.gridRow    = ROW[p.type];
-        bar.textContent      = p.label;
-        grid.appendChild(bar);
+
+      row.phases.forEach((_, pi) => {
+        grid.appendChild(buildBar(si, ri, pi));
       });
+
       rowEl.appendChild(grid);
       group.appendChild(rowEl);
     });
+
     body.appendChild(group);
   });
 }
-build();
+
+/* ══════════════════════════════════════
+   DRAG & RESIZE
+   ══════════════════════════════════════ */
+let dragState = null;
+
+function attachBarEvents(bar, handleL, handleR) {
+  // Left resize
+  handleL.addEventListener('mousedown', e => {
+    e.stopPropagation();
+    startDrag(e, bar, 'resize-l');
+  });
+
+  // Right resize
+  handleR.addEventListener('mousedown', e => {
+    e.stopPropagation();
+    startDrag(e, bar, 'resize-r');
+  });
+
+  // Move (click on centre = colour picker, drag = move)
+  bar.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('handle')) return;
+    startDrag(e, bar, 'move');
+  });
+
+  // Colour picker on click (not drag)
+  bar.addEventListener('click', e => {
+    if (e.target.classList.contains('handle')) return;
+    if (dragState && dragState.moved) return;
+    const si = +bar.dataset.si, ri = +bar.dataset.ri, pi = +bar.dataset.pi;
+    openPopup(e, si, ri, pi);
+  });
+}
+
+function startDrag(e, bar, mode) {
+  e.preventDefault();
+  const si = +bar.dataset.si, ri = +bar.dataset.ri, pi = +bar.dataset.pi;
+  const phase = STATE[si].rows[ri].phases[pi];
+  const mw = getMonthW();
+
+  dragState = {
+    bar, mode, si, ri, pi, mw,
+    startX: e.clientX,
+    origStart: phase.start,
+    origEnd:   phase.end,
+    moved: false,
+  };
+  bar.classList.add('dragging');
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const { bar, mode, si, ri, pi, mw, startX, origStart, origEnd } = dragState;
+  const dx = e.clientX - startX;
+  const dMonths = Math.round(dx / mw);
+  if (dMonths !== 0) dragState.moved = true;
+
+  const phase = STATE[si].rows[ri].phases[pi];
+  const span = origEnd - origStart;
+
+  if (mode === 'move') {
+    let ns = Math.max(1, Math.min(12 - span, origStart + dMonths));
+    phase.start = ns;
+    phase.end   = ns + span;
+  } else if (mode === 'resize-l') {
+    let ns = Math.max(1, Math.min(origEnd, origStart + dMonths));
+    phase.start = ns;
+  } else if (mode === 'resize-r') {
+    let ne = Math.max(origStart, Math.min(12, origEnd + dMonths));
+    phase.end = ne;
+  }
+
+  bar.style.gridColumn = `${phase.start} / ${phase.end + 1}`;
+});
+
+document.addEventListener('mouseup', () => {
+  if (!dragState) return;
+  dragState.bar.classList.remove('dragging');
+  dragState = null;
+});
+
+/* ══════════════════════════════════════
+   COLOUR PICKER
+   ══════════════════════════════════════ */
+let activePopupTarget = null;
+
+function openPopup(e, si, ri, pi) {
+  activePopupTarget = { si, ri, pi };
+  const popup = document.getElementById('colourPopup');
+  const phase = STATE[si].rows[ri].phases[pi];
+  const currentColor = phase.color || PHASE_DEFAULTS[phase.type].fg;
+
+  // Build swatches
+  const grid = document.getElementById('swatchGrid');
+  grid.innerHTML = '';
+  SWATCHES.forEach(hex => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (hex === currentColor ? ' active' : '');
+    sw.style.background = hex;
+    sw.title = hex;
+    sw.addEventListener('click', () => setBarColour(hex));
+    grid.appendChild(sw);
+  });
+
+  // Add "default" swatch
+  const defSw = document.createElement('div');
+  defSw.className = 'swatch';
+  defSw.style.background = 'linear-gradient(135deg, #333 50%, #fff 50%)';
+  defSw.title = 'Reset to default';
+  defSw.addEventListener('click', () => setBarColour(null));
+  grid.appendChild(defSw);
+
+  // Custom colour input
+  const custom = document.getElementById('customColour');
+  custom.value = currentColor.startsWith('#') ? currentColor : '#4caf78';
+  custom.oninput = () => setBarColour(custom.value);
+
+  // Position popup near click
+  popup.classList.add('show');
+  const rect = popup.getBoundingClientRect();
+  let x = e.clientX + 10;
+  let y = e.clientY + 10;
+  if (x + 200 > window.innerWidth)  x = e.clientX - 210;
+  if (y + 200 > window.innerHeight) y = e.clientY - 210;
+  popup.style.left = x + 'px';
+  popup.style.top  = y + 'px';
+}
+
+function setBarColour(hex) {
+  if (!activePopupTarget) return;
+  const { si, ri, pi } = activePopupTarget;
+  STATE[si].rows[ri].phases[pi].color = hex;
+
+  // Update the bar element directly without full re-render
+  const barEl = document.querySelector(
+    `[data-si="${si}"][data-ri="${ri}"][data-pi="${pi}"]`
+  );
+  if (barEl) {
+    const phase = STATE[si].rows[ri].phases[pi];
+    applyBarStyle(barEl, phase.type, hex);
+  }
+
+  // Update swatch active state
+  document.querySelectorAll('.swatch').forEach(sw => {
+    sw.classList.toggle('active', sw.style.background === hex || sw.title === hex);
+  });
+}
+
+function closePopup() {
+  document.getElementById('colourPopup').classList.remove('show');
+  activePopupTarget = null;
+}
+
+// Close popup on outside click
+document.addEventListener('click', e => {
+  const popup = document.getElementById('colourPopup');
+  if (!popup.contains(e.target) && !e.target.classList.contains('bar') &&
+      !e.target.classList.contains('bar-label')) {
+    closePopup();
+  }
+});
+
+/* ══════════════════════════════════════
+   RESET
+   ══════════════════════════════════════ */
+function resetAll() {
+  STATE = JSON.parse(JSON.stringify(DEFAULTS));
+  renderAll();
+  closePopup();
+}
+
+/* ══════════════════════════════════════
+   INIT
+   ══════════════════════════════════════ */
+renderAll();
 </script>
 </body>
 </html>

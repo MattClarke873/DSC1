@@ -211,6 +211,11 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 /* SAFETY QUIZ */
 .btn-safety{background:#3a7fc1;margin-top:0}
 .btn-hygiene{background:var(--hyg);color:var(--hyg-text);margin-top:0}
+.btn-full{font-size:14px;padding:13px 18px;border:2px dashed;background:transparent;margin-bottom:10px}
+.btn-full-know{border-color:var(--acc);color:var(--acc)}
+.btn-full-know:active{background:var(--acc-dim)}
+.btn-full-hyg{border-color:var(--hyg);color:var(--hyg)}
+.btn-full-hyg:active{background:var(--hyg-dim)}
 .sq-hd{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-shrink:0}
 .sq-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .sq-left{display:flex;align-items:center;gap:8px}
@@ -279,7 +284,7 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
 <div id="home" class="screen active">
   <div class="home-badge">DSC Level 1</div>
   <div class="home-title">Deer Stalking<br><strong>Certificate Quiz</strong></div>
-  <div class="home-sub">Knowledge: 50 questions &middot; pass 40/50 &nbsp;|&nbsp; Hygiene: 40 questions &middot; pass 32/40<br>Real exam pass mark: 80%</div>
+  <div class="home-sub">Knowledge: 50 questions &middot; pass 40/50 &nbsp;|&nbsp; Hygiene: 40 questions &middot; pass 32/40<br>Full exam modes available &middot; Real exam pass mark: 80%</div>
   <div id="resumeBanner"></div>
   <div class="stats-row">
     <div class="stat-box"><div class="stat-val" id="sAttempts">0</div><div class="stat-lbl">Attempts</div></div>
@@ -311,9 +316,11 @@ input:checked~.tog-thumb{transform:translateX(20px);background:var(--acc)}
   </div>
   <div id="recentList"></div>
   <div class="home-btns">
-    <button class="btn-primary" onclick="startQuiz()">Start Knowledge Quiz</button>
+    <button class="btn-primary" onclick="startQuiz()">Start Knowledge Quiz &nbsp;<small style="opacity:.7;font-size:13px">50 questions</small></button>
+    <button class="btn-primary btn-full btn-full-know" onclick="startFullExam('knowledge')">&#9654; Full Knowledge Exam &nbsp;<small id="fullKnowCount" style="opacity:.7;font-size:11px"></small></button>
     <button class="btn-primary btn-safety" onclick="startSafetyQuiz()">Start Safety Assessment</button>
-    <button class="btn-primary btn-hygiene" onclick="startHygQuiz()">Start Hygiene Quiz</button>
+    <button class="btn-primary btn-hygiene" onclick="startHygQuiz()">Start Hygiene Quiz &nbsp;<small style="opacity:.7;font-size:13px">40 questions</small></button>
+    <button class="btn-primary btn-full btn-full-hyg" onclick="startFullExam('hygiene')">&#9654; Full Hygiene Exam &nbsp;<small id="fullHygCount" style="opacity:.7;font-size:11px"></small></button>
     <button class="btn-ghost" onclick="showHistory()">View Score History</button>
     <button class="btn-ghost" onclick="showQBank()">Knowledge Question Bank</button>
     <button class="btn-ghost" onclick="showSQBank()">Safety Question Bank</button>
@@ -552,8 +559,11 @@ function rm(k){try{localStorage.removeItem(k);}catch(e){}}
    ============================================================ */
 const QN_KNOWLEDGE=50; // Real exam: 40/50 correct to pass (80%)
 const QN_HYGIENE=40;   // Real exam: 32/40 correct to pass (80%)
-let quizQs=[],current=0,answers=[],isWeighted=false,quizMode='knowledge'; // mode: 'knowledge'|'hygiene'
-function getQN(){return quizMode==='hygiene'?QN_HYGIENE:QN_KNOWLEDGE;}
+let quizQs=[],current=0,answers=[],isWeighted=false,quizMode='knowledge',fullExam=false;
+function getQN(){
+  if(fullExam) return quizMode==='hygiene' ? HQ.length : QB.length;
+  return quizMode==='hygiene' ? QN_HYGIENE : QN_KNOWLEDGE;
+}
 
 /* ============================================================
    HELPERS
@@ -571,6 +581,9 @@ function showHistory(){renderHistory();show('history');}
    HOME
    ============================================================ */
 function renderHome(){
+  // Dynamically set full exam question counts from the actual arrays
+  document.getElementById('fullKnowCount').textContent = 'All ' + QB.length + ' questions';
+  document.getElementById('fullHygCount').textContent  = 'All ' + HQ.length + ' questions';
   const hist=ld(SK.history)||[];
   document.getElementById('sAttempts').textContent=hist.length;
   if(hist.length){
@@ -610,6 +623,8 @@ function buildPool(){
   const bank = quizMode==='hygiene' ? HQ : QB;
   const keys = quizMode==='hygiene' ? HK : SK;
   const allIdx = shuffle(bank.map((_,i)=>i));
+  // Full exam: use every question in the bank, shuffled
+  if(fullExam) return allIdx;
   if(!isWeighted) return allIdx.slice(0,getQN());
 
   const w=ld(keys.weights)||{};
@@ -650,10 +665,17 @@ function buildPool(){
    ============================================================ */
 function startQuiz(){
   quizMode='knowledge';
+  fullExam=false;
   _startMCQ();
 }
 function startHygQuiz(){
   quizMode='hygiene';
+  fullExam=false;
+  _startMCQ();
+}
+function startFullExam(mode){
+  quizMode=mode;
+  fullExam=true;
   _startMCQ();
 }
 function _startMCQ(){
@@ -680,7 +702,7 @@ function _startMCQ(){
    ============================================================ */
 function pauseQuiz(){
   const keys = quizMode==='hygiene' ? HK : SK;
-  sv(keys.session,{quizQs,current,answers,isWeighted,quizMode});
+  sv(keys.session,{quizQs,current,answers,isWeighted,quizMode,fullExam});
   const done=answers.filter(a=>a!==-1).length;
   document.getElementById('pausedInfo').textContent=`Q${current+1} of ${getQN()} \u00b7 ${done} answered. Your progress is saved.`;
   show('paused');
@@ -692,6 +714,7 @@ function resumeSaved(){
   if(!sess){showHome();return;}
   quizQs=sess.quizQs;current=sess.current;answers=sess.answers;isWeighted=sess.isWeighted||false;
   quizMode=sess.quizMode||'knowledge';
+  fullExam=sess.fullExam||false;
   document.getElementById('weightPip').style.display=isWeighted?'inline-block':'none';
   document.getElementById('progFill').style.background = quizMode==='hygiene' ? 'var(--hyg)' : 'var(--acc)';
   show('quiz');renderQuestion();
@@ -778,7 +801,10 @@ function showResults(){
   hist.push({date:dateStr,correct,total:totalAns,pct,weighted:isWeighted,mode:quizMode});
   if(hist.length>100)hist.shift();
   sv(keys.history,hist);
-  const passTarget = quizMode==='hygiene' ? '32 out of 40' : '40 out of 50';
+  const totalQ = getQN();
+  const passTarget = fullExam
+    ? `${Math.ceil(totalQ*0.8)} out of ${totalQ}`
+    : quizMode==='hygiene' ? '32 out of 40' : '40 out of 50';
   document.getElementById('resIcon').textContent=pass?'\uD83C\uDFC6':'\uD83D\uDCCB';
   document.getElementById('resTitle').textContent=pass?'Well Done!':'Keep Practising';
   document.getElementById('resSub').textContent=pass?`You'd pass the real exam on this score.`:`Real exam requires ${passTarget} correct (80%).`;
@@ -810,10 +836,18 @@ function showResults(){
   document.getElementById('reviewSection').innerHTML=rh;
   // Update New Quiz button to restart same mode
   const nb = document.querySelector('#results .btn-primary');
-  if(quizMode==='hygiene'){
+  if(quizMode==='hygiene' && fullExam){
+    nb.textContent='New Full Hygiene Exam';
+    nb.className='btn-primary btn-hygiene';
+    nb.onclick=()=>startFullExam('hygiene');
+  } else if(quizMode==='hygiene'){
     nb.textContent='New Hygiene Quiz';
     nb.className='btn-primary btn-hygiene';
     nb.onclick=startHygQuiz;
+  } else if(fullExam){
+    nb.textContent='New Full Knowledge Exam';
+    nb.className='btn-primary';
+    nb.onclick=()=>startFullExam('knowledge');
   } else {
     nb.textContent='New Quiz';
     nb.className='btn-primary';
